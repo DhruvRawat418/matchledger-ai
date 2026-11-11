@@ -1,0 +1,332 @@
+{
+  "ground_truth_version": "0.1",
+  "case_id": "case-101",
+  "categories": [
+    "identical"
+  ],
+  "description": "Fully correct order: SKUs on every document, quantities and prices agree. No discrepancies; any alert is a false alert.",
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-101",
+      "revision": 1,
+      "document_id": "case-101-po-3001",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3001",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "USB-C cable, 1m",
+          "sku": "CBL-USBC",
+          "quantity": "50",
+          "unit": "each",
+          "unit_price": "4.25",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CBL-USBC | USB-C cable, 1m | 50 each | $4.25"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Wireless mouse",
+          "sku": "MSE-WL",
+          "quantity": "25",
+          "unit": "each",
+          "unit_price": "12.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MSE-WL | Wireless mouse | 25 each | $12.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-101",
+      "revision": 1,
+      "document_id": "case-101-inv-8101",
+      "document_type": "invoice",
+      "business_document_number": "INV-8101",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-101-po-3001",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "USB-C cable, 1m",
+          "sku": "CBL-USBC",
+          "quantity": "50",
+          "unit": "each",
+          "unit_price": "4.25",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CBL-USBC | USB-C cable, 1m | 50 each | $4.25"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Wireless mouse",
+          "sku": "MSE-WL",
+          "quantity": "25",
+          "unit": "each",
+          "unit_price": "12.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MSE-WL | Wireless mouse | 25 each | $12.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-101",
+      "revision": 1,
+      "document_id": "case-101-rcv-8101",
+      "document_type": "receipt",
+      "business_document_number": "DN-8101",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-101-po-3001",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "USB-C cable, 1m",
+          "sku": "CBL-USBC",
+          "quantity": "50",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CBL-USBC | USB-C cable, 1m | 50 each | received"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Wireless mouse",
+          "sku": "MSE-WL",
+          "quantity": "25",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MSE-WL | Wireless mouse | 25 each | received"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "line_tags": [
+    {
+      "line": {
+        "document_id": "case-101-inv-8101",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-101-inv-8101",
+        "line_id": "2"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-101-rcv-8101",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-101-rcv-8101",
+        "line_id": "2"
+      },
+      "match_category": "identical"
+    }
+  ],
+  "revisions": [
+    {
+      "revision": 1,
+      "event": "PO, invoice and receipt uploaded",
+      "document_ids": [
+        "case-101-po-3001",
+        "case-101-inv-8101",
+        "case-101-rcv-8101"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-101",
+          "revision": 1,
+          "source": {
+            "document_id": "case-101-inv-8101",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-101-po-3001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-101-po-3001",
+              "line_id": "2"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-101-po-3001",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU on line 1 agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU on line 1 agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-101",
+          "revision": 1,
+          "source": {
+            "document_id": "case-101-inv-8101",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-101-po-3001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-101-po-3001",
+              "line_id": "2"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-101-po-3001",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU on line 2 agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU on line 2 agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-101",
+          "revision": 1,
+          "source": {
+            "document_id": "case-101-rcv-8101",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-101-po-3001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-101-po-3001",
+              "line_id": "2"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-101-po-3001",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU on line 1 agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU on line 1 agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-101",
+          "revision": 1,
+          "source": {
+            "document_id": "case-101-rcv-8101",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-101-po-3001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-101-po-3001",
+              "line_id": "2"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-101-po-3001",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU on line 2 agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU on line 2 agrees with the PO"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-101",
+        "revision": 1,
+        "status": "clean",
+        "discrepancies": [],
+        "checked_lines": [
+          {
+            "document_id": "case-101-po-3001",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-101-po-3001",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-101-inv-8101",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-101-inv-8101",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-101-rcv-8101",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-101-rcv-8101",
+            "line_id": "2"
+          }
+        ]
+      }
+    }
+  ]
+}

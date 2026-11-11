@@ -1,0 +1,448 @@
+{
+  "ground_truth_version": "0.1",
+  "case_id": "case-105",
+  "categories": [
+    "identical",
+    "duplicate_document"
+  ],
+  "description": "Human document error on the receiving side: the same delivery note uploaded twice. The trap is double-counting the delivery (20 received instead of 10); the correct flag is duplicate_document, and an over-delivery quantity_mismatch here is a false alert.",
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-105",
+      "revision": 1,
+      "document_id": "case-105-po-3005",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3005",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Ergonomic desk lamp",
+          "sku": "LMP-ERG",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "18.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "LMP-ERG | Ergonomic desk lamp | 10 each | $18.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-105",
+      "revision": 1,
+      "document_id": "case-105-inv-7701",
+      "document_type": "invoice",
+      "business_document_number": "INV-7701",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-105-po-3005",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Ergonomic desk lamp",
+          "sku": "LMP-ERG",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "18.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "LMP-ERG | Ergonomic desk lamp | 10 each | $18.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-105",
+      "revision": 1,
+      "document_id": "case-105-rcv-7701a",
+      "document_type": "receipt",
+      "business_document_number": "DN-7701",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-105-po-3005",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Ergonomic desk lamp",
+          "sku": "LMP-ERG",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "LMP-ERG | Ergonomic desk lamp | 10 each | received"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-105",
+      "revision": 2,
+      "document_id": "case-105-rcv-7701b",
+      "document_type": "receipt",
+      "business_document_number": "DN-7701",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-105-po-3005",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Ergonomic desk lamp",
+          "sku": "LMP-ERG",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "LMP-ERG | Ergonomic desk lamp | 10 each | received"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "line_tags": [
+    {
+      "line": {
+        "document_id": "case-105-inv-7701",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-105-rcv-7701a",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-105-rcv-7701b",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    }
+  ],
+  "revisions": [
+    {
+      "revision": 1,
+      "event": "PO, invoice and delivery note uploaded; everything agrees",
+      "document_ids": [
+        "case-105-po-3005",
+        "case-105-inv-7701",
+        "case-105-rcv-7701a"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-105",
+          "revision": 1,
+          "source": {
+            "document_id": "case-105-inv-7701",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-105-po-3005",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU LMP-ERG agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU LMP-ERG agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-105",
+          "revision": 1,
+          "source": {
+            "document_id": "case-105-rcv-7701a",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-105-po-3005",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU LMP-ERG agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU LMP-ERG agrees with the PO"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-105",
+        "revision": 1,
+        "status": "clean",
+        "discrepancies": [],
+        "checked_lines": [
+          {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-105-inv-7701",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-105-rcv-7701a",
+            "line_id": "1"
+          }
+        ]
+      }
+    },
+    {
+      "revision": 2,
+      "event": "The same delivery note DN-7701 is uploaded a second time",
+      "document_ids": [
+        "case-105-po-3005",
+        "case-105-inv-7701",
+        "case-105-rcv-7701a",
+        "case-105-rcv-7701b"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-105",
+          "revision": 2,
+          "source": {
+            "document_id": "case-105-inv-7701",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-105-po-3005",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU LMP-ERG agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU LMP-ERG agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-105",
+          "revision": 2,
+          "source": {
+            "document_id": "case-105-rcv-7701a",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-105-po-3005",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU LMP-ERG agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU LMP-ERG agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-105",
+          "revision": 2,
+          "source": {
+            "document_id": "case-105-rcv-7701b",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-105-po-3005",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU LMP-ERG agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU LMP-ERG agrees with the PO"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-105",
+        "revision": 2,
+        "status": "needs_review",
+        "discrepancies": [
+          {
+            "code": "duplicate_document",
+            "lines": [
+              {
+                "document_id": "case-105-rcv-7701a",
+                "line_id": "1"
+              },
+              {
+                "document_id": "case-105-rcv-7701b",
+                "line_id": "1"
+              }
+            ],
+            "expected": null,
+            "observed": null,
+            "explanation": "DN-7701 appears twice with identical content. The correct received total is 10; summing both copies would wrongly show 20 received against 10 ordered"
+          }
+        ],
+        "checked_lines": [
+          {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-105-inv-7701",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-105-rcv-7701a",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-105-rcv-7701b",
+            "line_id": "1"
+          }
+        ]
+      }
+    },
+    {
+      "revision": 3,
+      "event": "Reviewer retires the duplicate delivery note",
+      "document_ids": [
+        "case-105-po-3005",
+        "case-105-inv-7701",
+        "case-105-rcv-7701a"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-105",
+          "revision": 3,
+          "source": {
+            "document_id": "case-105-inv-7701",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-105-po-3005",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU LMP-ERG agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU LMP-ERG agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-105",
+          "revision": 3,
+          "source": {
+            "document_id": "case-105-rcv-7701a",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-105-po-3005",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU LMP-ERG agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU LMP-ERG agrees with the PO"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-105",
+        "revision": 3,
+        "status": "clean",
+        "discrepancies": [],
+        "checked_lines": [
+          {
+            "document_id": "case-105-po-3005",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-105-inv-7701",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-105-rcv-7701a",
+            "line_id": "1"
+          }
+        ]
+      }
+    }
+  ]
+}

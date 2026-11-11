@@ -1,0 +1,505 @@
+{
+  "ground_truth_version": "0.1",
+  "case_id": "case-103",
+  "categories": [
+    "synonym",
+    "lookalike",
+    "price_error"
+  ],
+  "description": "Supplier uses different words for the same products (Display 24 in / 24-inch LED screen vs 24in Monitor; laptop vs notebook) and two monitor sizes invite a wrong match; the laptop is overbilled.",
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-103",
+      "revision": 1,
+      "document_id": "case-103-po-3003",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3003",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24in Monitor",
+          "sku": "MON-24",
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MON-24 | 24in Monitor | 5 each | $150.00"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "27in Monitor",
+          "sku": "MON-27",
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": "210.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MON-27 | 27in Monitor | 3 each | $210.00"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "Notebook computer, 14 inch",
+          "sku": "NBK-14",
+          "quantity": "2",
+          "unit": "each",
+          "unit_price": "899.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "NBK-14 | Notebook computer, 14 inch | 2 each | $899.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-103",
+      "revision": 1,
+      "document_id": "case-103-inv-8301",
+      "document_type": "invoice",
+      "business_document_number": "INV-8301",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-103-po-3003",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Display, 24 in",
+          "sku": null,
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Display, 24 in | 5 each | $150.00"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Monitor, 27 inch",
+          "sku": null,
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": "210.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Monitor, 27 inch | 3 each | $210.00"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "14in laptop",
+          "sku": null,
+          "quantity": "2",
+          "unit": "each",
+          "unit_price": "949.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "14in laptop | 2 each | $949.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-103",
+      "revision": 1,
+      "document_id": "case-103-rcv-8301",
+      "document_type": "receipt",
+      "business_document_number": "DN-8301",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-103-po-3003",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24-inch LED screen",
+          "sku": null,
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24-inch LED screen | 5 each | received"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "27 in. monitor",
+          "sku": null,
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "27 in. monitor | 3 each | received"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "laptop 14 inch",
+          "sku": null,
+          "quantity": "2",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "laptop 14 inch | 2 each | received"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "line_tags": [
+    {
+      "line": {
+        "document_id": "case-103-inv-8301",
+        "line_id": "1"
+      },
+      "match_category": "synonym"
+    },
+    {
+      "line": {
+        "document_id": "case-103-inv-8301",
+        "line_id": "2"
+      },
+      "match_category": "lookalike"
+    },
+    {
+      "line": {
+        "document_id": "case-103-inv-8301",
+        "line_id": "3"
+      },
+      "match_category": "synonym"
+    },
+    {
+      "line": {
+        "document_id": "case-103-rcv-8301",
+        "line_id": "1"
+      },
+      "match_category": "synonym"
+    },
+    {
+      "line": {
+        "document_id": "case-103-rcv-8301",
+        "line_id": "2"
+      },
+      "match_category": "formatting"
+    },
+    {
+      "line": {
+        "document_id": "case-103-rcv-8301",
+        "line_id": "3"
+      },
+      "match_category": "synonym"
+    }
+  ],
+  "revisions": [
+    {
+      "revision": 1,
+      "event": "PO, invoice and receipt uploaded",
+      "document_ids": [
+        "case-103-po-3003",
+        "case-103-inv-8301",
+        "case-103-rcv-8301"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-103",
+          "revision": 1,
+          "source": {
+            "document_id": "case-103-inv-8301",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-103-po-3003",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "A 24 in display / LED screen is the 24in monitor on PO line 1 (MON-24); display, screen and monitor are synonyms",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "A 24 in display / LED screen is the 24in monitor on PO line 1 (MON-24); display, screen and monitor are synonyms"
+            }
+          ]
+        },
+        {
+          "case_id": "case-103",
+          "revision": 1,
+          "source": {
+            "document_id": "case-103-inv-8301",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-103-po-3003",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 2 (MON-27); must not be matched to the 24in monitor",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Same product as PO line 2 (MON-27); must not be matched to the 24in monitor"
+            }
+          ]
+        },
+        {
+          "case_id": "case-103",
+          "revision": 1,
+          "source": {
+            "document_id": "case-103-inv-8301",
+            "line_id": "3"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-103-po-3003",
+            "line_id": "3"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "A 14in laptop is the notebook computer on PO line 3 (NBK-14)",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "A 14in laptop is the notebook computer on PO line 3 (NBK-14)"
+            }
+          ]
+        },
+        {
+          "case_id": "case-103",
+          "revision": 1,
+          "source": {
+            "document_id": "case-103-rcv-8301",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-103-po-3003",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "A 24 in display / LED screen is the 24in monitor on PO line 1 (MON-24); display, screen and monitor are synonyms",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "A 24 in display / LED screen is the 24in monitor on PO line 1 (MON-24); display, screen and monitor are synonyms"
+            }
+          ]
+        },
+        {
+          "case_id": "case-103",
+          "revision": 1,
+          "source": {
+            "document_id": "case-103-rcv-8301",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-103-po-3003",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 2 (MON-27); must not be matched to the 24in monitor",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Same product as PO line 2 (MON-27); must not be matched to the 24in monitor"
+            }
+          ]
+        },
+        {
+          "case_id": "case-103",
+          "revision": 1,
+          "source": {
+            "document_id": "case-103-rcv-8301",
+            "line_id": "3"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-103-po-3003",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-103-po-3003",
+            "line_id": "3"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "A 14in laptop is the notebook computer on PO line 3 (NBK-14)",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "A 14in laptop is the notebook computer on PO line 3 (NBK-14)"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-103",
+        "revision": 1,
+        "status": "needs_review",
+        "discrepancies": [
+          {
+            "code": "price_mismatch",
+            "lines": [
+              {
+                "document_id": "case-103-po-3003",
+                "line_id": "3"
+              },
+              {
+                "document_id": "case-103-inv-8301",
+                "line_id": "3"
+              }
+            ],
+            "expected": "899.00",
+            "observed": "949.00",
+            "explanation": "Laptop billed at 949.00 per unit; PO price is 899.00"
+          }
+        ],
+        "checked_lines": [
+          {
+            "document_id": "case-103-po-3003",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-103-po-3003",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-103-po-3003",
+            "line_id": "3"
+          },
+          {
+            "document_id": "case-103-inv-8301",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-103-inv-8301",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-103-inv-8301",
+            "line_id": "3"
+          },
+          {
+            "document_id": "case-103-rcv-8301",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-103-rcv-8301",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-103-rcv-8301",
+            "line_id": "3"
+          }
+        ]
+      }
+    }
+  ]
+}

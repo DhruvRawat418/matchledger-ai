@@ -1,0 +1,671 @@
+{
+  "ground_truth_version": "0.1",
+  "case_id": "case-104",
+  "categories": [
+    "identical",
+    "price_error",
+    "duplicate_document",
+    "revised_document"
+  ],
+  "description": "Human document errors: the same invoice uploaded twice, then a corrected invoice uploaded without retiring the original. Matching is trivial (SKUs everywhere); document handling is what is tested.",
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 1,
+      "document_id": "case-104-po-3004",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3004",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "45.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | $45.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 1,
+      "document_id": "case-104-inv-9901a",
+      "document_type": "invoice",
+      "business_document_number": "INV-9901",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-104-po-3004",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "47.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | $47.50"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 1,
+      "document_id": "case-104-rcv-9901",
+      "document_type": "receipt",
+      "business_document_number": "DN-9901",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-104-po-3004",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | received"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 2,
+      "document_id": "case-104-inv-9901b",
+      "document_type": "invoice",
+      "business_document_number": "INV-9901",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-104-po-3004",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "47.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | $47.50"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 3,
+      "document_id": "case-104-inv-9901c",
+      "document_type": "invoice",
+      "business_document_number": "INV-9901",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-104-po-3004",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "45.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | $45.00"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "line_tags": [
+    {
+      "line": {
+        "document_id": "case-104-inv-9901a",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-104-inv-9901b",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-104-inv-9901c",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-104-rcv-9901",
+        "line_id": "1"
+      },
+      "match_category": "identical"
+    }
+  ],
+  "revisions": [
+    {
+      "revision": 1,
+      "event": "PO, invoice and receipt uploaded",
+      "document_ids": [
+        "case-104-po-3004",
+        "case-104-inv-9901a",
+        "case-104-rcv-9901"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-104",
+          "revision": 1,
+          "source": {
+            "document_id": "case-104-inv-9901a",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-104",
+          "revision": 1,
+          "source": {
+            "document_id": "case-104-rcv-9901",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-104",
+        "revision": 1,
+        "status": "needs_review",
+        "discrepancies": [
+          {
+            "code": "price_mismatch",
+            "lines": [
+              {
+                "document_id": "case-104-po-3004",
+                "line_id": "1"
+              },
+              {
+                "document_id": "case-104-inv-9901a",
+                "line_id": "1"
+              }
+            ],
+            "expected": "45.00",
+            "observed": "47.50",
+            "explanation": "Chair billed at 47.50 per unit; PO price is 45.00"
+          }
+        ],
+        "checked_lines": [
+          {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-inv-9901a",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-rcv-9901",
+            "line_id": "1"
+          }
+        ]
+      }
+    },
+    {
+      "revision": 2,
+      "event": "User accidentally uploads the same invoice INV-9901 a second time",
+      "document_ids": [
+        "case-104-po-3004",
+        "case-104-inv-9901a",
+        "case-104-inv-9901b",
+        "case-104-rcv-9901"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-104",
+          "revision": 2,
+          "source": {
+            "document_id": "case-104-inv-9901a",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-104",
+          "revision": 2,
+          "source": {
+            "document_id": "case-104-inv-9901b",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-104",
+          "revision": 2,
+          "source": {
+            "document_id": "case-104-rcv-9901",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-104",
+        "revision": 2,
+        "status": "needs_review",
+        "discrepancies": [
+          {
+            "code": "duplicate_document",
+            "lines": [
+              {
+                "document_id": "case-104-inv-9901a",
+                "line_id": "1"
+              },
+              {
+                "document_id": "case-104-inv-9901b",
+                "line_id": "1"
+              }
+            ],
+            "expected": null,
+            "observed": null,
+            "explanation": "INV-9901 appears twice with identical content; paying both would double-pay the order"
+          },
+          {
+            "code": "price_mismatch",
+            "lines": [
+              {
+                "document_id": "case-104-po-3004",
+                "line_id": "1"
+              },
+              {
+                "document_id": "case-104-inv-9901a",
+                "line_id": "1"
+              },
+              {
+                "document_id": "case-104-inv-9901b",
+                "line_id": "1"
+              }
+            ],
+            "expected": "45.00",
+            "observed": "47.50",
+            "explanation": "Chair billed at 47.50 per unit; PO price is 45.00"
+          }
+        ],
+        "checked_lines": [
+          {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-inv-9901a",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-rcv-9901",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-inv-9901b",
+            "line_id": "1"
+          }
+        ]
+      }
+    },
+    {
+      "revision": 3,
+      "event": "Duplicate removed; supplier's corrected INV-9901 uploaded, but the original is left in place",
+      "document_ids": [
+        "case-104-po-3004",
+        "case-104-inv-9901a",
+        "case-104-inv-9901c",
+        "case-104-rcv-9901"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-104",
+          "revision": 3,
+          "source": {
+            "document_id": "case-104-inv-9901a",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-104",
+          "revision": 3,
+          "source": {
+            "document_id": "case-104-inv-9901c",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-104",
+          "revision": 3,
+          "source": {
+            "document_id": "case-104-rcv-9901",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-104",
+        "revision": 3,
+        "status": "needs_review",
+        "discrepancies": [
+          {
+            "code": "duplicate_document",
+            "lines": [
+              {
+                "document_id": "case-104-inv-9901a",
+                "line_id": "1"
+              },
+              {
+                "document_id": "case-104-inv-9901c",
+                "line_id": "1"
+              }
+            ],
+            "expected": null,
+            "observed": null,
+            "explanation": "Two conflicting versions of INV-9901 are current: the original bills 47.50, the correction bills 45.00; one must be retired"
+          },
+          {
+            "code": "price_mismatch",
+            "lines": [
+              {
+                "document_id": "case-104-po-3004",
+                "line_id": "1"
+              },
+              {
+                "document_id": "case-104-inv-9901a",
+                "line_id": "1"
+              }
+            ],
+            "expected": "45.00",
+            "observed": "47.50",
+            "explanation": "Chair billed at 47.50 per unit; PO price is 45.00"
+          }
+        ],
+        "checked_lines": [
+          {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-inv-9901a",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-rcv-9901",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-inv-9901c",
+            "line_id": "1"
+          }
+        ]
+      }
+    },
+    {
+      "revision": 4,
+      "event": "Reviewer retires the original invoice; only the corrected INV-9901 remains",
+      "document_ids": [
+        "case-104-po-3004",
+        "case-104-inv-9901c",
+        "case-104-rcv-9901"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-104",
+          "revision": 4,
+          "source": {
+            "document_id": "case-104-inv-9901c",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        },
+        {
+          "case_id": "case-104",
+          "revision": 4,
+          "source": {
+            "document_id": "case-104-rcv-9901",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-104-po-3004",
+              "line_id": "1"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "SKU CHR-STD agrees with the PO",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SKU CHR-STD agrees with the PO"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-104",
+        "revision": 4,
+        "status": "clean",
+        "discrepancies": [],
+        "checked_lines": [
+          {
+            "document_id": "case-104-po-3004",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-rcv-9901",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-104-inv-9901c",
+            "line_id": "1"
+          }
+        ]
+      }
+    }
+  ]
+}
