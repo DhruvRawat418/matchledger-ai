@@ -1,5 +1,5 @@
-"""Synthetic extraction/matching/review plus a demo-only quantity check."""
-from decimal import Decimal
+"""Synthetic extraction/matching/review with Matthew’s real reconciliation."""
+from src.reconciliation_adapter import reconcile_worker
 from demo.contracts_example import sample_documents, sample_matches
 from src.graph import Workers
 
@@ -23,28 +23,7 @@ def make_sample_workers(scenario: str) -> Workers:
             result.update(case_id=state["case_id"], revision=state["revision"])
         return matches
 
-    async def reconcile(state):
-        refs = [m["source"] for m in state["matches"]]
-        by_kind = {d['document_type']: d for d in state['documents']}
-        if len(state['documents']) != 3 or any(len(d['line_items']) != 1 for d in state['documents']):
-            raise ValueError('Demo checker supports only one line in each of three documents')
-        po, invoice, receipt = [by_kind[k]['line_items'][0] for k in ('purchase_order', 'invoice', 'receipt')]
-        if any(l['sku'] != 'MON-24' or l['unit'] != 'each' or l['quantity'] is None for l in (po, invoice, receipt)):
-            raise ValueError('Unsupported demo item/unit or missing quantity')
-        if po['unit_price'] != '125.50' or invoice['unit_price'] != '125.50':
-            raise ValueError('Unsupported demo price')
-        discrepancies = []
-        for label, expected, observed in [('ordered versus invoiced', po['quantity'], invoice['quantity']),
-                                           ('invoiced versus received', invoice['quantity'], receipt['quantity'])]:
-            if Decimal(expected) != Decimal(observed):
-                discrepancies.append({'code': 'quantity_mismatch', 'lines': refs,
-                    'expected': expected, 'observed': observed,
-                    'explanation': f'Demo quantity check: {label} differs.'})
-        return {'case_id': state['case_id'], 'revision': state['revision'],
-                'status': 'needs_review' if discrepancies else 'clean',
-                'checked_lines': refs, 'discrepancies': discrepancies}
-
     async def review(state):
         return {"case_id": state["case_id"], "revision": state["revision"], "findings": []}
 
-    return Workers(extract=extract, match=match, reconcile=reconcile, review=review)
+    return Workers(extract=extract, match=match, reconcile=reconcile_worker, review=review)

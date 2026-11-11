@@ -19,7 +19,8 @@ def test_clean_needs_human_review_not_approval():
 def test_empty_review_does_not_clear_quantity_issue():
     state = execute(make_sample_workers('short-delivery'))
     assert state['status'] == 'needs_correction'
-    assert state['issues'] == [{'code': 'quantity_mismatch', 'owner': 'reconcile'}]
+    assert state['issues'] == [{'code': 'quantity_mismatch', 'owner': 'reconcile'}] * 2
+    assert len(state['reconciliation']['discrepancies']) == 2
 
 
 @pytest.mark.parametrize('stage', ['extract', 'match', 'reconcile', 'review'])

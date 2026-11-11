@@ -1,8 +1,8 @@
 # First LangGraph workflow
 
-This is real LangGraph routing with explicitly synthetic workers. No model API
-calls, OCR, matching algorithm, full reconciliation engine or report generation
-has been implemented. The demo includes a limited deterministic quantity check.
+This is real LangGraph routing with synthetic extraction, matching and review.
+Reconciliation uses Matthew’s real deterministic engine through an adapter.
+No model API calls, OCR or report generation are implemented yet.
 
 ## Run it
 

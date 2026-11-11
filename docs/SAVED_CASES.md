@@ -2,8 +2,9 @@
 
 This local demo uses SQLite (`outputs/cases.sqlite`) and requires no API key.
 Run commands from the repository root with `.venv` activated. Extraction,
-matching and evidence review are synthetic. A small deterministic demo worker
-checks the saved quantities; it is not Matthew's full reconciliation engine.
+matching and evidence review are synthetic. Matthew's deterministic engine now checks quantities and prices through an adapter.
+Older saved cases without supplier IDs and PO links remain readable but will block
+on rerun; create a fresh case rather than invent those missing fields.
 
 ## 1. Create a short-delivery case
 

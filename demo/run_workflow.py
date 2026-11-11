@@ -8,7 +8,7 @@ from demo.sample_workers import make_sample_workers
 async def run(scenario):
     graph = build_graph(make_sample_workers(scenario))
     state = await graph.ainvoke(initial_state(f"demo-{scenario}"))
-    return {"mode": "synthetic_workers", "case_id": state["case_id"], "status": state["status"],
+    return {"mode": "synthetic_inputs_real_reconciliation", "case_id": state["case_id"], "status": state["status"],
             "issues": state["issues"], "stages": state["stages"]}
 
 if __name__ == "__main__":

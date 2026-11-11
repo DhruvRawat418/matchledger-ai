@@ -46,10 +46,15 @@ python -m demo.run_workflow --scenario short-delivery
 
 See [the orchestration guide](docs/ORCHESTRATION.md) for routing, worker adapters
 and current limitations. These commands run real LangGraph with predefined
-responses plus a small deterministic quantity check; they do not use AI or compute invoice totals.
+extraction/matching/review responses with Matthew’s real reconciliation engine.
+The engine calculates totals internally; the graph currently exposes discrepancies,
+not those totals. No live AI is connected.
 
 ## Saved cases and correction demo
 
 Follow [the saved-case guide](docs/SAVED_CASES.md) to create a case, reopen it,
 record a confirmed receipt-quantity correction and rerun checks. SQLite saves
 case revisions; this is not node-level LangGraph checkpointing.
+
+See [Matthew integration notes](docs/MATTHEW_INTEGRATION.md) for provenance,
+contract additions and exact-SKU limitations.

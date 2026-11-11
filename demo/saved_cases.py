@@ -9,7 +9,7 @@ from demo.sample_workers import make_sample_workers
 
 def summary(record):
     state = record['state']
-    return {'mode': 'synthetic_workers', 'case_id': state['case_id'], 'revision': state['revision'],
+    return {'mode': record.get('metadata', {}).get('mode', 'synthetic_workers'), 'case_id': state['case_id'], 'revision': state['revision'],
             'status': state['status'], 'issues': state['issues'], 'stages': state['stages'],
             'correction_history': record['corrections'], 'previous_revisions': len(record['history']),
             'stop_event': record.get('stop_event')}
@@ -46,7 +46,7 @@ async def main():
     try:
         if args.action == 'start':
             record = await start_case(store, make_sample_workers(args.scenario), args.case_id,
-                                      {'scenario': args.scenario, 'mode': 'synthetic_workers'})
+                                      {'scenario': args.scenario, 'mode': 'synthetic_inputs_real_reconciliation'})
         elif args.action == 'stop':
             record = stop_case(store, args.case_id, {
                 'expected_revision': args.revision, 'staff': args.staff,

@@ -73,3 +73,12 @@ calculation implementation. Everyone should use it to agree on their handoff.
 3. Implement workers using the shared fixture.
 4. Dhruv connects placeholders in LangGraph, then replaces each with a worker.
 5. Add human decisions, revision invalidation and review contracts together.
+
+## Reconciliation integration additions
+
+Extraction now supports nullable `supplier_id` and `purchase_order_id`. For actual
+reconciliation, PO/invoice supplier IDs and USD currency are required. Invoice
+and receipt `purchase_order_id` is an explicitly resolved internal PO document ID,
+not a model-invented ID or unverified source business number. Intake/linking must
+resolve this from source references. Null blocks computation; no fallback values.
+`src/reconciliation_adapter.py` currently supports exact SKU matches only.
