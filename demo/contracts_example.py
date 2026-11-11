@@ -8,7 +8,8 @@ def sample_documents():
     for doc_id, kind, quantity in [("po-001", "purchase_order", "20"), ("invoice-001", "invoice", "20"), ("receipt-001", "receipt", "18")]:
         docs.append(ExtractedDocument.model_validate({
             "case_id": "sample-001", "revision": 1, "document_id": doc_id,
-            "document_type": kind, "currency": None if kind == "receipt" else "USD",
+            "document_type": kind, "supplier_id": "SUP-SYNTHETIC" if kind != "receipt" else None,
+            "purchase_order_id": "po-001" if kind != "purchase_order" else None, "currency": None if kind == "receipt" else "USD",
             "line_items": [{"line_id": f"{doc_id}-line-1", "description": "24-inch monitor", "sku": "MON-24",
                             "quantity": quantity, "unit": "each", "unit_price": None if kind == "receipt" else "125.50",
                             "evidence": [{"page": 1, "text": f"MON-24 | 24-inch monitor | {quantity} each"}]}]}))

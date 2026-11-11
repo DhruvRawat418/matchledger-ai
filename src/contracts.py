@@ -30,6 +30,8 @@ class ExtractedDocument(Contract):
     document_id: Identifier
     document_type: Literal["purchase_order", "invoice", "receipt"]
     business_document_number: Identifier | None = None
+    supplier_id: Identifier | None = None
+    purchase_order_id: Identifier | None = None  # Internal PO document ID, assigned by intake/linking.
     currency: Literal["USD"] | None
     line_items: list[LineItem] = Field(min_length=1)
 
@@ -65,7 +67,7 @@ class MatchResult(Contract):
         return self
 
 class Discrepancy(Contract):
-    code: Literal["quantity_mismatch", "price_mismatch", "missing_information", "unmatched_item", "unit_mismatch", "duplicate_document"]
+    code: Literal["quantity_mismatch", "price_mismatch", "missing_information", "unmatched_item", "unit_mismatch", "duplicate_document", "supplier_mismatch"]
     lines: list[LineReference] = Field(min_length=1)
     expected: DecimalText | None
     observed: DecimalText | None
