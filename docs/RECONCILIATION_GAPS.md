@@ -10,10 +10,8 @@ If this note disagrees with either of them, they win.
 ## Engine in use
 
 The LangGraph workflow reconciles through `src/reconciliation_adapter.py`,
-which calls the `procurement_recon` engine. All work below targets that engine.
-
-`src/reconciliation.py` and `docs/RECONCILIATION_RULES.md` describe a separate
-worker. It is **not connected** to the workflow and is kept for reference only.
+which calls the `procurement_recon` engine. All work below targets that engine;
+there is no other reconciliation engine in the repository.
 
 ## Responsibilities: where they stand
 
