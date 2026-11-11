@@ -3,7 +3,7 @@
 Procurement and invoice reconciliation assistant — team starter.
 
 **Current branch: `Dhruv-orchestration`.** This is a draft contract foundation,
-not the completed application. There are no live agents, LangGraph workflow,
+not the completed application. There is a LangGraph skeleton with synthetic workers, but no live agents,
 dashboard or Docker container yet. No API key is needed for this example.
 
 ## Run locally (Python 3.11 or newer)
@@ -36,3 +36,20 @@ git switch -c YourName-component origin/Dhruv-orchestration
 Keep work off `main` until the team finalizes the project. Coordinate contract
 changes with every consuming component; don't silently rename shared fields.
 Do not commit keys, real business documents or local environments.
+
+## Orchestration demo
+
+```bash
+python -m demo.run_workflow --scenario clean
+python -m demo.run_workflow --scenario short-delivery
+```
+
+See [the orchestration guide](docs/ORCHESTRATION.md) for routing, worker adapters
+and current limitations. These commands run real LangGraph with predefined
+responses plus a small deterministic quantity check; they do not use AI or compute invoice totals.
+
+## Saved cases and correction demo
+
+Follow [the saved-case guide](docs/SAVED_CASES.md) to create a case, reopen it,
+record a confirmed receipt-quantity correction and rerun checks. SQLite saves
+case revisions; this is not node-level LangGraph checkpointing.
