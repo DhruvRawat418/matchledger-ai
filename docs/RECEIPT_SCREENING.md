@@ -9,7 +9,8 @@ two things:
 
 - **Receipt number.** This is the `business_document_number` field. Upper and
   lower case are treated the same.
-- **Lines.** For each line, the SKU, quantity and unit. Line IDs are ignored,
+- **Lines.** For each line, the SKU, quantity and unit. Line IDs are ignored.
+  SKUs and units are normalized first (`mon-24` = `MON-24`, `EA` = `each`),
   and `"2"` and `"2.0"` count as the same quantity.
 
 | Two receipts... | Treated as | Counted | Result |

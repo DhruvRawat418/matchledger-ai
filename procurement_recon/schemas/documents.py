@@ -90,7 +90,9 @@ class SupplierInvoice:
         _require_text("supplier_id", self.supplier_id)
         _require_text("currency", self.currency)
         object.__setattr__(self, "lines", tuple(self.lines))
-        _require_unique_skus(self.document_id, self.lines)
+        # An invoice may bill the same SKU on several lines (e.g. split charges).
+        # reconcile() adds their quantities and checks each line's price, so no
+        # uniqueness rule here. Purchase orders and deliveries keep theirs.
 
 
 @dataclass(frozen=True)

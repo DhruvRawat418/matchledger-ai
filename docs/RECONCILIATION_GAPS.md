@@ -17,13 +17,13 @@ there is no other reconciliation engine in the repository.
 
 | # | Responsibility | Status |
 |---|---|---|
-| 1 | Exact SKU matching, normalized/fuzzy baseline | Exact, case-sensitive only. No normalization or fuzzy matching (gap G3) |
+| 1 | Exact SKU matching, normalized/fuzzy baseline | Exact match ignoring letter case and surrounding spaces. No fuzzy matching (gap G3) |
 | 2–4 | Three-way check of quantities and prices, Decimal arithmetic | Done |
 | 5 | Partial deliveries, multiple receipts | Done. A shortfall is reported as `needs_review` |
 | 6 | Repeated uploads not double-counted | Done in the adapter ([RECEIPT_SCREENING.md](RECEIPT_SCREENING.md)). A full fix needs gap G2 |
 | 7 | Replacements exclude superseded records | Gap G1. Conflicting versions block the case; nothing is guessed |
 | 8 | Missing values never become zero | Done. Missing data blocks the case and no totals are produced |
-| 9 | Size, model and unit conflicts | Units: exact text only. SKU conflicts are blocked. Size and model: gap G4 |
+| 9 | Size, model and unit conflicts | Units: small explicit equivalence list, otherwise blocked. SKU conflicts are blocked. Size and model: gap G4 |
 | 10 | Structured findings, calculation traces | Implemented as a **proposed** extension (quantities, amounts, calculation), pending Dhruv and Maia |
 | 11 | Tests and documented rules | `tests/test_receipt_duplicates.py`, `tests/test_reconciliation_output.py`; rules in DATA_CONTRACTS.md (proposed section) and RECEIPT_SCREENING.md |
 
@@ -44,8 +44,25 @@ there is no other reconciliation engine in the repository.
 | G2 | File fingerprint, so a re-upload can be told apart from a genuine identical delivery | Dhruv (ingestion) | An optional file hash recorded at upload |
 | G3 | Who owns normalized/fuzzy SKU matching, and how non-exact matches reach the adapter | Jijuan, Dhruv, Matthew | Not yet proposed |
 | G4 | Model and size attributes on line items | Abdullah, Dhruv | Optional fields on `LineItem`, only if the test cases need them |
-| G5 | Standard unit spellings (`ea` vs `each`) | Abdullah | Normalize during extraction |
+| G5 | Standard unit spellings beyond the adapter's list | Abdullah | Normalize during extraction |
+| G7 | A dedicated code for two identical lines on one invoice (today `duplicate_document` + `[POSSIBLE_REPEATED_LINE]`) | Dhruv, Maia | Add a `duplicate_line` discrepancy code |
+| G8 | Repeated product on one receipt, or on the PO (blocked today) | Dhruv, Matthew | Only if the test cases need it; receipts need line-level repeat screening first |
 | G6 | The reconciliation output extension | Dhruv, Maia | See the PROPOSED section of DATA_CONTRACTS.md |
+
+## Matching rules in the adapter
+
+- **SKU.** Compared exactly, ignoring letter case and surrounding spaces:
+  `mon-24` = `MON-24`. Any other difference still blocks the case, so
+  `MON 24` ≠ `MON-24`. There is no fuzzy matching.
+- **Unit.** `each`, `ea`, `pc`, `pcs`, `piece` and `pieces` all mean one item,
+  ignoring letter case and a trailing period. Any other unit must match apart
+  from letter case. Units are never converted (for example, `box` ≠ `each`).
+- **Same product on several invoice lines.** The quantities are added up, and
+  each line's price is checked on its own. If the lines are completely
+  identical, they are still all counted, but the case is flagged for review in
+  case extraction repeated a line.
+- **Messages.** Every blocking problem names its document and line. All the
+  problems found at the same stage are reported together.
 
 ## Known limits today
 
