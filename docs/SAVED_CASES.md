@@ -83,3 +83,29 @@ prevent duplicate worker calls during concurrent resume attempts.
 Use `--db PATH` before the subcommand to select a different database. Use the
 same path for subsequent commands. The default path is relative to the working
 directory. Databases are ignored by Git; back them up separately if needed.
+
+## Stop a case without changing the facts
+
+When the recorded shortfall is real and this case cannot proceed, close it:
+
+```bash
+python -m demo.saved_cases start stop-001
+python -m demo.saved_cases stop stop-001 \
+  --revision 1 \
+  --staff "Dhruv" \
+  --reason "Synthetic case: only 18 monitors arrived; closing with shortfall unresolved" \
+  --confirm
+python -m demo.saved_cases show stop-001
+```
+
+Expected: `stopped`, revision 1, the original quantity issue and a `stop_event`
+containing the previous status, staff, reason and UTC time. The document revision
+stays the same because stopping changes no source data. The internal database
+version advances. No workers run, nothing is deleted and discrepancies remain.
+
+`stop_case(store, case_id, request)` is the synchronous service for Maia's future
+UI. It accepts `expected_revision`, `staff`, `reason` and a strict boolean
+`confirmed`. Only `needs_correction`, `blocked` and `ready_for_human_review`
+cases may stop. Running cases cannot be stopped by this action; it is not a
+job-cancellation mechanism. Stopped cases cannot be corrected, resumed, restarted
+under the same ID or stopped again. There is no reopen action in this version.

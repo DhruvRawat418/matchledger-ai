@@ -96,3 +96,33 @@ async def correct_receipt_quantity(store, workers, case_id, correction):
     # Persist the correction and invalidation BEFORE calling any worker.
     version = store.save(record, version)
     return await _execute(store, workers, version, record)
+
+
+class StopCaseRequest(Contract):
+    expected_revision: PositiveInt
+    staff: Identifier
+    reason: Identifier
+    confirmed: bool = Field(strict=True)
+
+
+def stop_case(store, case_id, request):
+    """Close an idle case without changing evidence or calling workers.
+
+    The input revision stays unchanged because no source data changed.
+    SQLite's record version still advances to reject stale concurrent writes.
+    """
+    request = StopCaseRequest.model_validate(request)
+    version, record = store.load(case_id)
+    state = record['state']
+    if state['revision'] != request.expected_revision:
+        raise ValueError('Stale revision; reload the saved case')
+    if not request.confirmed:
+        raise ValueError('Confirm that this case should be stopped')
+    if state['status'] not in {'needs_correction', 'blocked', 'ready_for_human_review'}:
+        raise ValueError('Only an idle, non-stopped case can be stopped')
+    record['stop_event'] = {**request.model_dump(), 'kind': 'case_stopped',
+                            'previous_status': state['status'], 'recorded_at': now()}
+    state['status'] = 'stopped'
+    record['updated_at'] = record['stop_event']['recorded_at']
+    store.save(record, version)
+    return record

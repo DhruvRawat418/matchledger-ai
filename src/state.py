@@ -19,7 +19,7 @@ class ReviewResult(Contract):
 class WorkflowState(TypedDict, total=False):
     case_id: str
     revision: int
-    status: Literal["running", "ready_for_human_review", "needs_correction", "blocked"]
+    status: Literal["running", "ready_for_human_review", "needs_correction", "blocked", "stopped"]
     documents: list[dict]
     matches: list[dict]
     reconciliation: dict | None

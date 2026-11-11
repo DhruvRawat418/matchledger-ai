@@ -2,8 +2,8 @@
 import argparse
 import asyncio
 import json
-from src.case_store import CaseStore, CaseConflict
-from src.case_service import start_case, correct_receipt_quantity, resume_case
+from src.case_store import CaseStore
+from src.case_service import start_case, correct_receipt_quantity, resume_case, stop_case
 from demo.sample_workers import make_sample_workers
 
 
@@ -11,7 +11,8 @@ def summary(record):
     state = record['state']
     return {'mode': 'synthetic_workers', 'case_id': state['case_id'], 'revision': state['revision'],
             'status': state['status'], 'issues': state['issues'], 'stages': state['stages'],
-            'correction_history': record['corrections'], 'previous_revisions': len(record['history'])}
+            'correction_history': record['corrections'], 'previous_revisions': len(record['history']),
+            'stop_event': record.get('stop_event')}
 
 
 async def main():
@@ -34,12 +35,22 @@ async def main():
     correction.add_argument('--reason', required=True)
     correction.add_argument('--source-confirmation', required=True)
     correction.add_argument('--confirm', action='store_true')
+    stop = sub.add_parser('stop')
+    stop.add_argument('case_id')
+    stop.add_argument('--revision', type=int, required=True)
+    stop.add_argument('--staff', required=True)
+    stop.add_argument('--reason', required=True)
+    stop.add_argument('--confirm', action='store_true')
     args = parser.parse_args()
     store = CaseStore(args.db)
     try:
         if args.action == 'start':
             record = await start_case(store, make_sample_workers(args.scenario), args.case_id,
                                       {'scenario': args.scenario, 'mode': 'synthetic_workers'})
+        elif args.action == 'stop':
+            record = stop_case(store, args.case_id, {
+                'expected_revision': args.revision, 'staff': args.staff,
+                'reason': args.reason, 'confirmed': args.confirm})
         else:
             _, record = store.load(args.case_id)
             if args.action != 'show':
