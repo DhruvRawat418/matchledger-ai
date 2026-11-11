@@ -41,6 +41,31 @@ class Discrepancy:
     expected: Decimal | None = None
     actual: Decimal | None = None
     amount: Decimal | None = None
+    # Plain-text arithmetic behind this finding, e.g. "billed 20 - received 18 = 2".
+    calculation: str | None = None
+
+
+@dataclass(frozen=True)
+class LineTotal:
+    """Ordered, received and billed quantities for one purchase order SKU,
+    with the document-by-document parts that were added up."""
+
+    sku: str
+    ordered: Decimal
+    received: Decimal
+    billed: Decimal
+    received_from: tuple[tuple[str, Decimal], ...]
+    billed_from: tuple[tuple[str, Decimal], ...]
+
+    @property
+    def calculation(self) -> str:
+        def parts(label: str, items: tuple[tuple[str, Decimal], ...], total: Decimal) -> str:
+            if not items:
+                return f"{label} = 0 (no matching lines)"
+            return f"{label} = " + " + ".join(f"{qty} [{doc}]" for doc, qty in items) + f" = {total}"
+
+        return "; ".join([f"ordered = {self.ordered}", parts("received", self.received_from, self.received),
+                          parts("invoiced", self.billed_from, self.billed)])
 
 
 @dataclass(frozen=True)
@@ -57,6 +82,24 @@ class ReconciliationReport:
     billed_total: Decimal | None
     supported_total: Decimal | None
     unsupported_amount: Decimal | None
+    # One entry per purchase order line, in purchase order order.
+    line_totals: tuple[LineTotal, ...] = ()
+
+    @property
+    def billed_above_supported(self) -> Decimal | None:
+        """unsupported_amount when positive, else 0 (never negative)."""
+        if self.unsupported_amount is None:
+            return None
+        amount = self.unsupported_amount
+        return amount if amount > 0 else Decimal("0")
+
+    @property
+    def supported_not_billed(self) -> Decimal | None:
+        """How far billing falls short of the supported value, else 0 (never negative)."""
+        if self.unsupported_amount is None:
+            return None
+        amount = self.unsupported_amount
+        return -amount if amount < 0 else Decimal("0")  # avoids "-0.00"
 
 
 @dataclass(frozen=True)

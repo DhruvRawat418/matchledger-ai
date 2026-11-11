@@ -8,6 +8,44 @@ from procurement_recon.schemas.documents import PurchaseOrder, SupplierInvoice, 
 from procurement_recon.reconciliation.reconciliation_rules import reconcile
 
 
+def _receipt_number(doc):
+    number = doc.business_document_number
+    return None if number is None else number.casefold()
+
+
+def _receipt_content(doc):
+    """What a receipt says was delivered, ignoring line IDs and number formatting."""
+    return tuple(sorted((line.sku or '', str(Decimal(line.quantity).normalize()) if line.quantity is not None else '',
+                         line.unit or '') for line in doc.line_items))
+
+
+def screen_receipts(receipts):
+    """Decide which receipts count as separate deliveries before any quantity is added up.
+
+    Returns (counted, repeats, conflict):
+    - counted: receipts treated as distinct deliveries, in input order.
+    - repeats: (repeat, original, verified) for receipts counted only once. `verified` is True when
+      both carry the same receipt number and identical lines; False when the lines are identical but
+      at least one receipt has no number, so we cannot prove they are the same delivery.
+    - conflict: (first, second) when two receipts share a number but list different lines. We cannot
+      tell whether one replaces the other, so the caller must block rather than guess.
+    Receipts with different numbers, or with different lines, are separate deliveries.
+    """
+    counted, repeats = [], []
+    for receipt in receipts:
+        number, content = _receipt_number(receipt), _receipt_content(receipt)
+        for kept in counted:
+            if number is not None and number == _receipt_number(kept) and content != _receipt_content(kept):
+                return counted, repeats, (kept, receipt)
+        original = next((kept for kept in counted if content == _receipt_content(kept) and (
+            number is None or _receipt_number(kept) is None or number == _receipt_number(kept))), None)
+        if original is None:
+            counted.append(receipt)
+        else:
+            repeats.append((receipt, original, number is not None and number == _receipt_number(original)))
+    return counted, repeats, None
+
+
 async def reconcile_worker(state):
     docs = [ExtractedDocument.model_validate(d) for d in state['documents']]
     matches = [MatchResult.model_validate(m) for m in state['matches']]
@@ -52,22 +90,55 @@ async def reconcile_worker(state):
         if source.unit != target.unit:
             return blocked('unit_mismatch', 'Units differ; no implicit unit conversion is allowed')
 
+    # A repeated upload is not a new delivery. Screen receipts before the engine adds anything up.
+    counted_receipts, repeats, conflict = screen_receipts(receipts)
+    if conflict:
+        first, second = conflict
+        return blocked('duplicate_document', f'Receipts {first.document_id} and {second.document_id} share receipt '
+                       f'number {first.business_document_number} but list different lines. Cannot tell whether one '
+                       'replaces the other; neither is counted until a person confirms which is current.')
+    screening = []
+    for repeat, original, verified in repeats:
+        reason = (f'same receipt number {repeat.business_document_number} and identical lines' if verified else
+                  'identical lines and no receipt number to tell them apart; confirm if they are separate deliveries')
+        screening.append({'code': 'duplicate_document',
+            'lines': [ref for ref in refs if ref['document_id'] in {repeat.document_id, original.document_id}],
+            'expected': None, 'observed': None,
+            'explanation': f"[{'REPEATED_RECEIPT' if verified else 'POSSIBLE_REPEATED_RECEIPT'}] "
+                           f'{repeat.document_id} repeats {original.document_id} ({reason}); counted once.',
+            'calculation': f'received totals include {original.document_id} and exclude {repeat.document_id}'})
+
     def priced(d):
         return tuple(PricedLine(l.sku, l.description or '', Decimal(l.quantity), Decimal(l.unit_price)) for l in d.line_items)
     report = reconcile(
         PurchaseOrder(po.document_id, po.revision, po.supplier_id, po.currency, priced(po)),
         [SupplierInvoice(d.document_id, d.revision, d.purchase_order_id, d.supplier_id, d.currency, priced(d)) for d in invoices],
         [DeliveryRecord(d.document_id, d.revision, d.purchase_order_id,
-            tuple(DeliveryLine(l.sku, l.description or '', Decimal(l.quantity)) for l in d.line_items)) for d in receipts])
-    mapped = []
+            tuple(DeliveryLine(l.sku, l.description or '', Decimal(l.quantity)) for l in d.line_items)) for d in counted_receipts])
+    mapped = screening
     for finding in report.discrepancies:
         code = {'PRICE_MISMATCH': 'price_mismatch', 'SUPPLIER_MISMATCH': 'supplier_mismatch',
                 'UNMATCHED_INVOICE_LINE': 'unmatched_item', 'UNMATCHED_DELIVERY_LINE': 'unmatched_item',
                 'CURRENCY_MISMATCH': 'missing_information'}.get(finding.type.value, 'quantity_mismatch')
         relevant = [ref for ref in refs if (finding.sku is None or by_ref[(ref['document_id'], ref['line_id'])].sku == finding.sku)
                     and (finding.document_id is None or ref['document_id'] in {finding.document_id, po.document_id})]
-        mapped.append({'code': code, 'lines': relevant, 'expected': str(finding.expected) if finding.expected is not None else None,
-            'observed': str(finding.actual) if finding.actual is not None else None,
-            'explanation': f'[{finding.type.value}] {finding.message}'})
+        mapped.append({'code': code, 'lines': relevant, 'expected': _text(finding.expected),
+            'observed': _text(finding.actual), 'explanation': f'[{finding.type.value}] {finding.message}',
+            'calculation': finding.calculation})
+
+    # Totals come straight from the engine; the adapter only formats them (no arithmetic here).
+    po_line_by_sku = {l.sku: l.line_id for l in po.line_items}
+    quantities = [{'po_line': {'document_id': po.document_id, 'line_id': po_line_by_sku[t.sku]},
+                   'ordered': _text(t.ordered), 'received': _text(t.received), 'invoiced': _text(t.billed),
+                   'calculation': t.calculation} for t in report.line_totals]
+    amounts = None if report.billed_total is None else {'currency': po.currency,
+        'billed': _text(report.billed_total), 'supported': _text(report.supported_total),
+        'unsupported': _text(report.billed_above_supported), 'unbilled': _text(report.supported_not_billed)}
     return ReconciliationResult.model_validate({'case_id': state['case_id'], 'revision': state['revision'],
-        'status': 'needs_review' if mapped else 'clean', 'checked_lines': refs, 'discrepancies': mapped}).model_dump()
+        'status': 'needs_review' if mapped else 'clean', 'checked_lines': refs, 'discrepancies': mapped,
+        'quantities': quantities, 'amounts': amounts}).model_dump()
+
+
+def _text(value):
+    """Decimal -> plain decimal text (never scientific notation); None stays None."""
+    return None if value is None else format(value, 'f')
