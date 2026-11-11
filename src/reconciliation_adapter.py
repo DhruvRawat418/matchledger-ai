@@ -105,7 +105,8 @@ async def reconcile_worker(state):
             'lines': [ref for ref in refs if ref['document_id'] in {repeat.document_id, original.document_id}],
             'expected': None, 'observed': None,
             'explanation': f"[{'REPEATED_RECEIPT' if verified else 'POSSIBLE_REPEATED_RECEIPT'}] "
-                           f'{repeat.document_id} repeats {original.document_id} ({reason}); counted once.'})
+                           f'{repeat.document_id} repeats {original.document_id} ({reason}); counted once.',
+            'calculation': f'received totals include {original.document_id} and exclude {repeat.document_id}'})
 
     def priced(d):
         return tuple(PricedLine(l.sku, l.description or '', Decimal(l.quantity), Decimal(l.unit_price)) for l in d.line_items)
@@ -121,8 +122,23 @@ async def reconcile_worker(state):
                 'CURRENCY_MISMATCH': 'missing_information'}.get(finding.type.value, 'quantity_mismatch')
         relevant = [ref for ref in refs if (finding.sku is None or by_ref[(ref['document_id'], ref['line_id'])].sku == finding.sku)
                     and (finding.document_id is None or ref['document_id'] in {finding.document_id, po.document_id})]
-        mapped.append({'code': code, 'lines': relevant, 'expected': str(finding.expected) if finding.expected is not None else None,
-            'observed': str(finding.actual) if finding.actual is not None else None,
-            'explanation': f'[{finding.type.value}] {finding.message}'})
+        mapped.append({'code': code, 'lines': relevant, 'expected': _text(finding.expected),
+            'observed': _text(finding.actual), 'explanation': f'[{finding.type.value}] {finding.message}',
+            'calculation': finding.calculation})
+
+    # Totals come straight from the engine; the adapter only formats them (no arithmetic here).
+    po_line_by_sku = {l.sku: l.line_id for l in po.line_items}
+    quantities = [{'po_line': {'document_id': po.document_id, 'line_id': po_line_by_sku[t.sku]},
+                   'ordered': _text(t.ordered), 'received': _text(t.received), 'invoiced': _text(t.billed),
+                   'calculation': t.calculation} for t in report.line_totals]
+    amounts = None if report.billed_total is None else {'currency': po.currency,
+        'billed': _text(report.billed_total), 'supported': _text(report.supported_total),
+        'unsupported': _text(report.billed_above_supported), 'unbilled': _text(report.supported_not_billed)}
     return ReconciliationResult.model_validate({'case_id': state['case_id'], 'revision': state['revision'],
-        'status': 'needs_review' if mapped else 'clean', 'checked_lines': refs, 'discrepancies': mapped}).model_dump()
+        'status': 'needs_review' if mapped else 'clean', 'checked_lines': refs, 'discrepancies': mapped,
+        'quantities': quantities, 'amounts': amounts}).model_dump()
+
+
+def _text(value):
+    """Decimal -> plain decimal text (never scientific notation); None stays None."""
+    return None if value is None else format(value, 'f')

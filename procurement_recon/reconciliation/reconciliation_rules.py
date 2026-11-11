@@ -23,6 +23,7 @@ from procurement_recon.schemas.documents import (
 from procurement_recon.schemas.results import (
     Discrepancy,
     DiscrepancyType,
+    LineTotal,
     ReconciliationReport,
     ReconciliationStatus,
 )
@@ -100,6 +101,7 @@ def compare_quantities(
                 actual=received,
                 message=f"{sku}: ordered {ordered}, received {received}; "
                 f"{ordered - received} missing",
+                calculation=f"ordered {ordered} - received {received} = {ordered - received} short",
             )
         )
     elif received > ordered:
@@ -111,6 +113,7 @@ def compare_quantities(
                 actual=received,
                 message=f"{sku}: ordered {ordered}, received {received}; "
                 f"{received - ordered} extra",
+                calculation=f"received {received} - ordered {ordered} = {received - ordered} extra",
             )
         )
 
@@ -123,6 +126,8 @@ def compare_quantities(
                 actual=billed,
                 amount=(billed - received) * unit_price,
                 message=f"{sku}: billed {billed}, received {received}",
+                calculation=f"billed {billed} - received {received} = {billed - received} units"
+                f" x PO price {unit_price} = {(billed - received) * unit_price}",
             )
         )
     if billed > ordered:
@@ -134,6 +139,8 @@ def compare_quantities(
                 actual=billed,
                 amount=(billed - ordered) * unit_price,
                 message=f"{sku}: billed {billed}, ordered {ordered}",
+                calculation=f"billed {billed} - ordered {ordered} = {billed - ordered} units"
+                f" x PO price {unit_price} = {(billed - ordered) * unit_price}",
             )
         )
 
@@ -148,6 +155,9 @@ def compare_quantities(
                 amount=(payable - billed) * unit_price,
                 message=f"{sku}: billed {billed}, but {payable} "
                 "were ordered and received",
+                calculation=f"payable = lower of ordered {ordered} and received {received} = {payable}; "
+                f"payable {payable} - billed {billed} = {payable - billed} units"
+                f" x PO price {unit_price} = {(payable - billed) * unit_price}",
             )
         )
 
@@ -182,6 +192,8 @@ def compare_unit_price(
         amount=difference * quantity,
         message=f"{sku}: {document_id} charges {invoiced_price} per unit, "
         f"purchase order says {expected_price}",
+        calculation=f"invoice price {invoiced_price} - PO price {expected_price} = {difference} per unit"
+        f" x billed quantity {quantity} = {difference * quantity}",
     )
 
 
@@ -208,11 +220,14 @@ def reconcile(
     received: dict[str, Decimal] = {line.sku: ZERO for line in purchase_order.lines}
     billed: dict[str, Decimal] = {line.sku: ZERO for line in purchase_order.lines}
     unit_prices = {line.sku: line.unit_price for line in purchase_order.lines}
+    received_from: dict[str, list[tuple[str, Decimal]]] = {sku: [] for sku in received}
+    billed_from: dict[str, list[tuple[str, Decimal]]] = {sku: [] for sku in billed}
 
     for delivery in current_deliveries:
         match = match_exact_sku(purchase_order.lines, delivery.lines)
         for line in match.matched:
             received[line.sku] += line.quantity
+            received_from[line.sku].append((delivery.document_id, line.quantity))
         for line in match.unmatched:
             discrepancies.append(
                 Discrepancy(
@@ -222,6 +237,7 @@ def reconcile(
                     actual=line.quantity,
                     message=f"{line.sku}: on {delivery.document_id} "
                     "but not on the purchase order",
+                    calculation=f"received {line.quantity} of a SKU not on the purchase order",
                 )
             )
 
@@ -234,6 +250,7 @@ def reconcile(
         match = match_exact_sku(purchase_order.lines, invoice.lines)
         for line in match.matched:
             billed[line.sku] += line.quantity
+            billed_from[line.sku].append((invoice.document_id, line.quantity))
             if same_currency:
                 finding = compare_unit_price(
                     line.sku,
@@ -255,6 +272,8 @@ def reconcile(
                     amount=line.quantity * line.unit_price,
                     message=f"{line.sku}: billed on {invoice.document_id} "
                     "but not on the purchase order",
+                    calculation=f"billed {line.quantity} x invoice price {line.unit_price}"
+                    f" = {line.quantity * line.unit_price} for a SKU not on the purchase order",
                 )
             )
 
@@ -302,6 +321,17 @@ def reconcile(
         billed_total=billed_total,
         supported_total=supported_total,
         unsupported_amount=unsupported_amount,
+        line_totals=tuple(
+            LineTotal(
+                sku=line.sku,
+                ordered=line.quantity,
+                received=received[line.sku],
+                billed=billed[line.sku],
+                received_from=tuple(received_from[line.sku]),
+                billed_from=tuple(billed_from[line.sku]),
+            )
+            for line in purchase_order.lines
+        ),
     )
 
 

@@ -1,5 +1,10 @@
 # Reconciliation rules — v0.1 draft (Matthew)
 
+> **Not connected to the workflow.** These rules describe the separate worker in
+> `src/reconciliation.py`, which is kept for reference only. The workflow uses
+> `src/reconciliation_adapter.py` and the `procurement_recon` engine. See
+> [RECONCILIATION_GAPS.md](RECONCILIATION_GAPS.md).
+
 The reconciliation worker takes the extracted documents and the line-matching
 decisions for one case and answers a single business question:
 
@@ -113,7 +118,7 @@ text) and the outcome. Examples: "received total = 9 + 9 = 18", "invoiced 18 ≤
 received 18: OK". Every discrepancy also appears in the trace. There are no
 timestamps or random values, so running the same case twice produces an
 identical trace. The trace is not yet part of the shared contract; see
-[the change proposal](proposals/reconciliation-contract-changes.md).
+[RECONCILIATION_GAPS.md](RECONCILIATION_GAPS.md).
 
 ## Worked example (the shared team fixture)
 

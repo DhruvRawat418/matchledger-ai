@@ -35,7 +35,7 @@ was received or more than was ordered.
   so both are counted. When the total exceeds the order, the over-delivery
   check catches it. A replacement that lands exactly on the ordered quantity
   could still look clean. The proper fix is an explicit "replaces document X"
-  field, which has been proposed (CONTRACTS.md §12, C4 / W3).
+  field (gap G1 in [RECONCILIATION_GAPS.md](RECONCILIATION_GAPS.md)).
 - **No file fingerprint is available, so identical contents are used instead.**
   Two genuinely identical deliveries without receipt numbers are therefore
   flagged for review, not counted silently.
