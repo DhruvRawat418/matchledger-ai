@@ -86,22 +86,53 @@ document content.
 
 ## Model provider
 
-`client.py` defines the `ModelClient` interface (`complete(system, user, pages,
-json_schema) -> ModelReply`). The provider adapter is a single file still to be
-added, once the team records its model choice. The API key is read from `.env`,
-which Git ignores. `FakeModelClient` returns scripted replies so the tests run
-offline.
+`client.py` defines the `ModelClient` interface. `providers.py` has adapters for
+**OpenAI, Anthropic and Google Gemini**. Each one sends the page images and the
+prompt over HTTPS and asks for a JSON reply, with temperature 0 so runs repeat.
+You choose the provider in `.env`; copy `.env.example`, and remember Git ignores
+`.env`:
 
-Each outcome records `prompt_version`, `model_id`, `attempts`, `latency_ms` and
-provider token `usage` for the evaluation.
+```
+MATCHLEDGER_PROVIDER=openai | anthropic | gemini
+MATCHLEDGER_MODEL=<exact model identifier>
+<PROVIDER>_API_KEY=...
+```
 
-## Evaluation
+API keys are only sent in request headers. Errors report the provider and HTTP
+status only, never the response body (which can repeat document text) and never
+the key. `FakeModelClient` returns scripted replies so the tests run offline.
 
-`src/extraction/scoring.py` scores a document against an answer key
-(`documents[]` in Jijuan's ground-truth cases), field by field: header fields,
-then line fields paired by `line_id`, plus whether the number of lines is right.
-`accuracy()` combines the results per field and overall. Evidence wording isn't
-scored.
+## Evaluation and model selection
+
+`python -m src.extraction.evaluate` runs extraction over answer-key cases and writes
+three files to `outputs/extraction/<model>-<time>/`:
+
+- `summary.json`: accuracy overall, by field, by document type and by layout;
+  the share of valid JSON on the first try; failure and needs-review rates; issue
+  counts; median and 95th-percentile latency; tokens; and estimated cost if
+  prices are given.
+- `results.jsonl`: every outcome and its score.
+- `field_errors.csv`: every wrong field, for error analysis.
+
+```
+python -m src.extraction.evaluate --cases <answer-key folder> --files <rendered docs> \
+    --suppliers suppliers.json --layouts layouts.csv --only case-001 case-002 \
+    --price-in <USD per 1M input tokens> --price-out <USD per 1M output tokens>
+```
+
+Rendered documents go in `<files>/<case_id>/<document_id>.pdf`. The `--repeat N`
+option runs every document N times to measure how much results vary. By default
+the model must determine the document type itself; `--declare-type` passes the
+true type instead.
+
+**Model selection (proposal, with Jijuan).** Run the command once per candidate
+model on the development cases only, then record the results here:
+
+| Model identifier | Provider | Field accuracy | Valid JSON 1st try | Median / p95 latency | Cost per doc | Chosen |
+| --- | --- | --- | --- | --- | --- | --- |
+| | | | | | | |
+
+The held-out cases stay unused until the prompt and model are frozen.
 
 ## Open decisions for the team
 
