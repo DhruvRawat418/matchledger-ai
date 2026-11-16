@@ -34,7 +34,7 @@ def test_openai_request_and_reply():
     reply = call(client)
     body = json.loads(seen[0].content)
     assert seen[0].headers["authorization"] == f"Bearer {KEY}"
-    assert body["model"] == "model-x" and body["temperature"] == 0.0
+    assert body["model"] == "model-x" and "temperature" not in body  # Not sent unless configured.
     assert body["response_format"] == {"type": "json_object"}
     assert body["messages"][1]["content"][0]["image_url"]["url"].startswith("data:image/png;base64,")
     assert (reply.text, reply.usage) == ("{\"a\":1}", {"input_tokens": 7, "output_tokens": 3})
@@ -81,6 +81,36 @@ def test_network_failure_is_model_call_error(cls):
         call(cls("m", api_key=KEY, transport=httpx.MockTransport(boom)))
 
 
+def test_temperature_sent_only_when_configured():
+    seen = []
+    reply = {"content": [{"type": "text", "text": "{}"}]}
+    call(AnthropicClient("m", api_key=KEY, temperature=0.0, transport=mock(reply, seen=seen)))
+    assert json.loads(seen[0].content)["temperature"] == 0.0
+
+
+def test_provider_error_message_reaches_the_outcome_but_not_the_key():
+    """Regression for the first real run (2026-11-16): all 26 documents failed with
+    a bare 'HTTP 400' because the model rejects `temperature`. The provider's own
+    message must now be visible in the outcome, so the cause is clear."""
+    error = {"type": "error", "error": {"type": "invalid_request_error",
+                                        "message": "`temperature` is deprecated for this model."}}
+    client = AnthropicClient("m", api_key=KEY, transport=mock(error, status=400))
+    with pytest.raises(ModelCallError) as info:
+        call(client)
+    assert "deprecated" in str(info.value) and "invalid_request_error" in info.value.safe_detail
+
+    from src.extraction import ExtractionRequest, extract_document
+    request = ExtractionRequest(case_id="c", revision=1, document_id="d", file_path="x.pdf")
+    outcome = asyncio.run(extract_document(request, client, pages=[PAGE], max_attempts=1))
+    assert outcome.document is None
+    assert "HTTP 400" in outcome.issues[0].message and "deprecated" in outcome.issues[0].message
+
+    leaky = {"error": {"type": "authentication_error", "message": f"bad key {KEY}"}}
+    with pytest.raises(ModelCallError) as info:
+        call(AnthropicClient("m", api_key=KEY, transport=mock(leaky, status=401)))
+    assert KEY not in str(info.value) and "authentication_error" in str(info.value)
+
+
 def test_empty_reply_is_model_call_error():
     with pytest.raises(ModelCallError):
         call(AnthropicClient("m", api_key=KEY, transport=mock({"content": []})))
@@ -92,6 +122,9 @@ def test_client_from_env(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", KEY)
     client = client_from_env()
     assert isinstance(client, AnthropicClient) and client.model_id == "some-model"
+    assert client.temperature is None
+    monkeypatch.setenv("MATCHLEDGER_TEMPERATURE", "0")
+    assert client_from_env().temperature == 0.0
     monkeypatch.delenv("ANTHROPIC_API_KEY")
     with pytest.raises(ValueError, match="ANTHROPIC_API_KEY"):
         client_from_env()

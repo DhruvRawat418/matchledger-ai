@@ -1,7 +1,12 @@
 """Turn an uploaded file into page images (for the vision model) and, when the PDF
 has one, its text layer (used only to verify the model's evidence quotes)."""
+import logging
 from dataclasses import dataclass
 from pathlib import Path
+
+# pypdf logs a warning per file it has to repair (e.g. line endings changed by Git
+# on Windows); the file is still read correctly, so only errors are shown.
+logging.getLogger("pypdf").setLevel(logging.ERROR)
 
 PNG_MAGIC = b"\x89PNG\r\n\x1a\n"
 JPEG_MAGIC = b"\xff\xd8\xff"

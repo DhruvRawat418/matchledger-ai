@@ -88,7 +88,10 @@ document content.
 
 `client.py` defines the `ModelClient` interface. `providers.py` has adapters for
 **OpenAI, Anthropic and Google Gemini**. Each one sends the page images and the
-prompt over HTTPS and asks for a JSON reply, with temperature 0 so runs repeat.
+prompt over HTTPS and asks for a JSON reply. No temperature setting is sent unless
+`MATCHLEDGER_TEMPERATURE` is set, because some current models reject the parameter
+(see the change log below). How much results vary between runs is measured with
+`--repeat`.
 You choose the provider in `.env`; copy `.env.example`, and remember Git ignores
 `.env`:
 
@@ -98,9 +101,10 @@ MATCHLEDGER_MODEL=<exact model identifier>
 <PROVIDER>_API_KEY=...
 ```
 
-API keys are only sent in request headers. Errors report the provider and HTTP
-status only, never the response body (which can repeat document text) and never
-the key. `FakeModelClient` returns scripted replies so the tests run offline.
+API keys are only sent in request headers. An error reports the provider, the
+HTTP status and the provider's short error type and message (cut to 200
+characters, and dropped if it contains the key), never the raw response body and
+never the key. That detail is carried into the outcome's `extraction_failed` issue. `FakeModelClient` returns scripted replies so the tests run offline.
 
 ## Evaluation and model selection
 
@@ -169,6 +173,13 @@ belongs to the answer keys, not the model, so open decision 1 below caps
 reachable accuracy at 96.7% until it's settled. On this set the classic/compact
 split (98.9% / 94.4%) only reflects which cases got which layout. To compare
 layouts fairly, render every case in both (`--layout`) and evaluate each folder.
+
+## Change log from real runs
+
+| Date | What the run showed | Change | Effect |
+| --- | --- | --- | --- |
+| 2026-11-16 | First real run (claude-sonnet-5-5, 26 rendered documents): every call failed, 0 tokens used, and the issue only said `ModelCallError`. A direct API call showed HTTP 400 `` `temperature` is deprecated for this model ``. | Stop sending temperature by default (optional `MATCHLEDGER_TEMPERATURE`). Copy the provider's error type and message into the issue. | Calls go through; future failures name their cause. |
+| 2026-11-16 | Every PDF triggered `incorrect startxref pointer` warnings on Windows, because Git turned the PDFs' line endings into CRLF and shifted their internal offsets. | `.gitattributes` marks PDF and image files as binary. pypdf repair warnings are hidden. | Files arrive byte-identical on every OS, which duplicate detection by file hash depends on. |
 
 ## Open decisions for the team
 

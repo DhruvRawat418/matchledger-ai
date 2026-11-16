@@ -1,0 +1,4 @@
+# Binary test documents: never convert line endings (Windows checkouts broke PDF offsets)
+*.pdf binary
+*.png binary
+*.jpg binary

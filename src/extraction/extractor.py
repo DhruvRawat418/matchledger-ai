@@ -75,7 +75,11 @@ async def extract_document(request: ExtractionRequest, client: ModelClient,
             model_doc = ModelDocument.model_validate_json(_strip_fences(reply.text))
             break
         except (ModelCallError, ValidationError) as exc:
-            last_error = type(exc).__name__  # Never echo provider text or document content.
+            # Never echo raw provider text or document content; only an adapter's
+            # sanitized detail (HTTP status and provider error message).
+            last_error = type(exc).__name__
+            if getattr(exc, "safe_detail", None):
+                last_error += f": {exc.safe_detail}"
     if model_doc is None:
         return finish(None, [_issue("extraction_failed",
                                     f"No usable model output after {attempts} attempt(s) ({last_error})")],
