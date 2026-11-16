@@ -19,7 +19,7 @@ from src.extraction.client import ModelCallError, ModelClient
 from src.extraction.normalize import (NotANumber, clean_text, comparable, currency_code, decimal_text,
                                       numbers_in, split_quantity_unit, unit_text)
 from src.extraction.pages import Page, UnsupportedFile, load_pages
-from src.extraction.prompt import PROMPT_VERSION, SYSTEM_PROMPT, output_schema, user_message
+from src.extraction.prompt import active_prompt, output_schema, user_message
 from src.extraction.schema import ExtractionIssue, ExtractionOutcome, ExtractionRequest, ModelDocument
 
 MAX_ATTEMPTS = 3
@@ -49,7 +49,8 @@ async def extract_document(request: ExtractionRequest, client: ModelClient,
                            pages: list[Page] | None = None,
                            max_attempts: int = MAX_ATTEMPTS) -> ExtractionOutcome:
     started = time.perf_counter()
-    base = {"prompt_version": PROMPT_VERSION, "model_id": client.model_id}
+    prompt_version, system_prompt = active_prompt()
+    base = {"prompt_version": prompt_version, "model_id": client.model_id}
 
     def finish(document, issues, attempts, usage, model_doc=None):
         return ExtractionOutcome(
@@ -68,7 +69,7 @@ async def extract_document(request: ExtractionRequest, client: ModelClient,
     model_doc, last_error, attempts = None, None, 0
     for attempts in range(1, max_attempts + 1):
         try:
-            reply = await client.complete(system=SYSTEM_PROMPT, user=user_message([p.text for p in pages]),
+            reply = await client.complete(system=system_prompt, user=user_message([p.text for p in pages]),
                                           pages=pages, json_schema=output_schema())
             for key, value in reply.usage.items():
                 usage[key] = usage.get(key, 0) + value

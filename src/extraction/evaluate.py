@@ -19,7 +19,7 @@ from pathlib import Path
 
 from src.contracts import ExtractedDocument
 from src.extraction.extractor import extract_document
-from src.extraction.prompt import PROMPT_VERSION
+from src.extraction.prompt import active_prompt
 from src.extraction.schema import ExtractionRequest
 from src.extraction.scoring import score_document
 
@@ -89,7 +89,9 @@ def summarize(rows: list[dict], missing: int, model_id: str, price_in: float | N
     issues = Counter(i["code"] for o in outcomes for i in o["issues"])
     n = len(outcomes)
     summary = {
-        "model_id": model_id, "prompt_version": PROMPT_VERSION, "documents_scored": n,
+        "model_id": model_id,
+        "prompt_version": outcomes[0]["prompt_version"] if outcomes else active_prompt()[0],
+        "documents_scored": n,
         "documents_missing_files": missing,
         "accuracy_overall": _ratio(correct, total),
         "accuracy_by_field": {f: round(correct[f] / total[f], 4) for f in sorted(total)},
@@ -151,7 +153,8 @@ def main(argv=None):
     rows, missing = asyncio.run(evaluate(client, cases, args.files, suppliers, load_layouts(args.layouts),
                                          args.declare_type, args.repeat))
     summary = summarize(rows, missing, client.model_id, args.price_in, args.price_out)
-    out = args.out or Path("outputs/extraction") / f"{client.model_id.replace('/', '_')}-{time.strftime('%Y%m%d-%H%M%S')}"
+    out = args.out or Path("outputs/extraction") / (f"{client.model_id.replace('/', '_')}-{summary['prompt_version']}"
+                                                    f"-{time.strftime('%Y%m%d-%H%M%S')}")
     write_outputs(out, rows, summary)
     print(json.dumps(summary, indent=2))
     print(f"\nWrote {out}/summary.json, results.jsonl, field_errors.csv")
