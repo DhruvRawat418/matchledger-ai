@@ -134,10 +134,46 @@ model on the development cases only, then record the results here:
 
 The held-out cases stay unused until the prompt and model are frozen.
 
+## Test documents (rendered answer keys)
+
+`python -m src.extraction.render` turns Jijuan's answer keys (`documents[]` in each
+case on the `test_cases` branch) into the files the extractor is tested on.
+
+```
+git checkout origin/test_cases -- ground-truth-format   # bring in the answer keys (don't commit)
+python -m src.extraction.render --cases ground-truth-format/eval/cases --out eval/rendered --scan
+```
+
+- **One file per answer-key document:** `eval/rendered/<case_id>/<document_id>.pdf`.
+  The answer keys from 2026-11-11 (7 cases) give 26 documents, already committed.
+- **Rows match the answer key:** each product row is printed exactly as its
+  answer-key `evidence.text`, on the cited page, and every row is checked against
+  the PDF text layer after rendering.
+- **Two layouts**, alternated by case so every document type appears in both:
+  `classic` (letterhead, ruled table) and `compact` (monospace, numbered rows).
+  `--layout classic|compact` renders every case in one layout.
+- **Scans:** `--scan` also writes degraded PNG scans (rotated, blurred, speckled,
+  no text layer) to `eval/rendered-scan/` for the messy-scan condition.
+- **Duplicates:** rendering is deterministic, so a duplicate upload in the answer
+  keys (case-104 INV-9901 a/b, case-105 DN-7701 a/b) gives byte-identical files.
+  That's what file-hash duplicate detection needs.
+- **Supplier names:** `eval/rendered/suppliers.json` maps printed names to IDs
+  (Acme Displays Inc. → SUP-ACME and so on). Pass it to `--suppliers`.
+  `layouts.csv` goes to `--layouts`.
+
+**Perfect-reader check (2026-11-16).** A fake model that copies exactly what is
+printed was run through the extractor and scoring on all 26 files. Every field
+scored 100% except `unit` (74%): 12 lines print no unit, while the answer keys
+expect `"each"` (case-001 receipts, case-002 invoice and receipt). That gap
+belongs to the answer keys, not the model, so open decision 1 below caps
+reachable accuracy at 96.7% until it's settled. On this set the classic/compact
+split (98.9% / 94.4%) only reflects which cases got which layout. To compare
+layouts fairly, render every case in both (`--layout`) and evaluate each folder.
+
 ## Open decisions for the team
 
-1. **Unit not printed.** Some answer keys (case-001 receipts, case-002 invoice)
-   expect `"each"` where no unit is printed. Extraction returns `null`, as the
+1. **Unit not printed.** Some answer keys (case-001 receipts, case-002 invoice
+   and receipt; 12 lines) expect `"each"` where no unit is printed. Extraction returns `null`, as the
    contract requires. Either the answer keys change, or the team agrees on a
    documented default.
 2. **Supplier list.** `supplier_id` (for example `SUP-ACME`) isn't printed on
@@ -146,5 +182,5 @@ The held-out cases stay unused until the prompt and model are frozen.
    `WorkflowState` yet. Proposal: add them to `issues` with `owner: "extract"`.
 4. **Size and model fields (gap G4).** Not added. Descriptions keep the size as
    printed. Add the fields only if the test cases need them.
-5. **PDF rendering of the answer keys.** Assigned to Dhruv in
-   `make_sample_cases.py`.
+5. **PDF rendering of the answer keys.** Done (Abdullah, at Dhruv's request).
+   See "Test documents" above.

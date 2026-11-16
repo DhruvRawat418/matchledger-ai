@@ -6,7 +6,7 @@ import json
 import httpx
 import pytest
 
-from src.extraction import FakeModelClient, ModelCallError, Page
+from src.extraction import FakeModelClient, ModelCallError, Page, load_pages
 from src.extraction.evaluate import evaluate, summarize, write_outputs
 from src.extraction.providers import AnthropicClient, GeminiClient, OpenAIClient, client_from_env
 
@@ -137,3 +137,79 @@ def test_evaluation_run_end_to_end(tmp_path):
     write_outputs(tmp_path / "out", rows, summary)
     assert json.loads((tmp_path / "out" / "summary.json").read_text())["documents_scored"] == 2
     assert (tmp_path / "out" / "field_errors.csv").read_text().count("\n") == 1  # header only
+
+
+# ------------------------------------------------------------------ rendering answer keys to PDFs
+
+def _render_case():
+    line = {"line_id": "1", "description": "Ergonomic desk lamp", "sku": "LMP-ERG", "quantity": "10",
+            "unit": "each", "unit_price": "18.00",
+            "evidence": [{"page": 1, "text": "LMP-ERG | Ergonomic desk lamp | 10 each | $18.00"}]}
+    base = {"case_id": "case-r", "revision": 1, "supplier_id": "SUP-SYNTH", "currency": "USD"}
+    po = {**base, "document_id": "case-r-po", "document_type": "purchase_order",
+          "business_document_number": "PO-9", "purchase_order_id": None, "line_items": [line]}
+    receipt_line = {**line, "unit_price": None,
+                    "evidence": [{"page": 1, "text": "LMP-ERG | Ergonomic desk lamp | 10 each | received"}]}
+    receipts = [{**base, "currency": None, "document_id": f"case-r-rcv-{x}", "document_type": "receipt",
+                 "business_document_number": "DN-9", "purchase_order_id": "case-r-po",
+                 "line_items": [receipt_line]} for x in "ab"]
+    return {"case_id": "case-r", "documents": [po, *receipts]}
+
+
+@pytest.mark.parametrize("layout", ["classic", "compact"])
+def test_rendered_documents_carry_every_evidence_row(tmp_path, layout):
+    pytest.importorskip("reportlab")
+    from src.extraction.render import check_rendered, render_cases
+
+    case = _render_case()
+    written = render_cases([case], tmp_path, layout=layout)
+    assert [w["layout"] for w in written] == [layout] * 3
+    assert check_rendered([case], tmp_path) == []
+    text = load_pages(tmp_path / "case-r" / "case-r-rcv-a.pdf")[0].text
+    assert "DN-9" in text and "PO-9" in text and "USD" not in text  # Receipts print no currency.
+
+
+def test_duplicate_upload_renders_identical_bytes(tmp_path):
+    pytest.importorskip("reportlab")
+    from src.extraction.render import render_cases
+
+    render_cases([_render_case()], tmp_path)
+    folder = tmp_path / "case-r"
+    assert (folder / "case-r-rcv-a.pdf").read_bytes() == (folder / "case-r-rcv-b.pdf").read_bytes()
+
+
+def test_rendered_files_score_perfectly_with_a_perfect_reader(tmp_path):
+    """Renderer, supplier list, extractor and scoring agree with the answer key."""
+    pytest.importorskip("reportlab")
+    from src.extraction.render import SUPPLIER_NAMES, render_cases, write_metadata
+
+    case = _render_case()
+    written = render_cases([case], tmp_path)
+    write_metadata(tmp_path, written)
+    suppliers = json.loads((tmp_path / "suppliers.json").read_text())
+    assert suppliers == {name: sid for sid, name in SUPPLIER_NAMES.items()}
+
+    def transcription(doc):
+        line = doc["line_items"][0]
+        return json.dumps({"document_type": doc["document_type"], "business_document_number": doc["business_document_number"],
+                           "supplier_name": "Synthetic Office Supply Co.", "referenced_po_number": None,
+                           "currency": doc["currency"], "line_items": [{
+                               "description": line["description"], "sku": line["sku"], "quantity": "10", "unit": "each",
+                               "unit_price": "$18.00" if line["unit_price"] else None, "evidence_page": 1,
+                               "evidence_text": line["evidence"][0]["text"]}]})
+
+    client = FakeModelClient([transcription(d) for d in case["documents"]])
+    rows, missing = asyncio.run(evaluate(client, [case], tmp_path, suppliers, {}))
+    assert missing == 0 and summarize(rows, 0, "perfect", None, None)["accuracy_overall"] == 1.0
+    assert all(r["outcome"]["issues"] == [] for r in rows)  # Evidence found on every rendered page.
+
+
+def test_scan_variant_has_no_text_layer(tmp_path):
+    pytest.importorskip("reportlab")
+    from src.extraction.render import render_cases
+
+    render_cases([_render_case()], tmp_path / "rendered", scan=True)
+    scans = sorted((tmp_path / "rendered-scan" / "case-r").glob("*.png"))
+    assert len(scans) == 3
+    pages = load_pages(scans[0])
+    assert pages[0].media_type == "image/png" and pages[0].text is None
