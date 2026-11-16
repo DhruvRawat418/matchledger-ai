@@ -18,6 +18,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 from src.contracts import ExtractedDocument
+from src.extraction.crosscheck import check_case
 from src.extraction.extractor import extract_document
 from src.extraction.prompt import active_prompt
 from src.extraction.schema import ExtractionRequest
@@ -43,26 +44,37 @@ def load_layouts(path: Path | None) -> dict[str, str]:
 
 async def evaluate(client, cases: list[dict], files_dir: Path, suppliers: dict, layouts: dict,
                    declare_type: bool = False, repeat: int = 1) -> tuple[list[dict], int]:
+    """Extract every answer-key document, run the cross-document checks per case
+    (as intake would), then score. Issues from both stages are in each outcome."""
     rows, missing = [], 0
     for case in cases:
+        expected_docs = []
         for raw in case["documents"]:
             expected = ExtractedDocument.model_validate(raw)
             path = find_file(files_dir, case["case_id"], expected.document_id)
             if path is None:
                 missing += 1
-                continue
-            for run in range(1, repeat + 1):
+            else:
+                expected_docs.append((expected, path))
+        for run in range(1, repeat + 1):
+            outcomes = []
+            for expected, path in expected_docs:
                 request = ExtractionRequest(
                     case_id=expected.case_id, revision=expected.revision, document_id=expected.document_id,
                     file_path=path, supplier_directory=suppliers,
                     declared_type=expected.document_type if declare_type else None)
-                outcome = await extract_document(request, client)
-                score = score_document(outcome.document, expected)
+                outcomes.append(await extract_document(request, client))
+            extra = check_case(outcomes)
+            for (expected, _), outcome in zip(expected_docs, outcomes):
+                if outcome.document is not None and outcome.document.document_id in extra:
+                    outcome = outcome.model_copy(
+                        update={"issues": [*outcome.issues, *extra[outcome.document.document_id]]})
                 rows.append({"case_id": case["case_id"], "document_id": expected.document_id, "run": run,
                              "document_type": expected.document_type,
                              "layout": layouts.get(expected.document_id, "unknown"),
                              "categories": case.get("categories", []),
-                             "outcome": json.loads(outcome.model_dump_json()), "score": score})
+                             "outcome": json.loads(outcome.model_dump_json()),
+                             "score": score_document(outcome.document, expected)})
     return rows, missing
 
 
@@ -102,6 +114,10 @@ def summarize(rows: list[dict], missing: int, model_id: str, price_in: float | N
         "extraction_failure_rate": round(sum(o["document"] is None for o in outcomes) / n, 4) if n else None,
         "needs_review_rate": round(sum(o["document"] is None or any(i["severity"] == "review" for i in o["issues"])
                                        for o in outcomes) / n, 4) if n else None,
+        # Documents with at least one wrong field and no review issue: errors that
+        # would reach reconciliation without anyone being told. The key safety measure.
+        "silent_error_documents": sum(bool(r["score"]["errors"]) and not any(
+            i["severity"] == "review" for i in r["outcome"]["issues"]) for r in rows),
         "issue_counts": dict(issues.most_common()),
         "latency_ms_median": round(statistics.median(latencies), 1) if latencies else None,
         "latency_ms_p95": latencies[max(0, round(0.95 * len(latencies)) - 1)] if latencies else None,

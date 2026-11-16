@@ -75,6 +75,8 @@ something like `"approved": true` is rejected and retried.
 | `evidence_not_found` | review | The quoted row isn't in the PDF's text on that page |
 | `evidence_page_invalid` | review | Cites a page the document doesn't have |
 | `evidence_unverified` | info | Scanned or image page; quotes can't be checked automatically |
+| `po_number_possible_misread` | review | (cross-check) A referenced PO number matches a PO only after look-alike characters are treated as equal; on both documents |
+| `po_reference_not_found` | review | (cross-check) An invoice or receipt references a PO number that no purchase order in the case has |
 | `supplier_unresolved` | review (info on receipts) | Supplier name isn't in the supplier list |
 | `currency_unknown` / `unsupported_currency` | review | Currency must be confirmed before money checks |
 | `document_type_conflict` | review | Upload type and model reading disagree |
@@ -141,8 +143,10 @@ on the same documents for a controlled before/after. Output folders are named
 | 1 | original (supplier unlabelled on POs) | extract-v1 | 96.2% | 92.3% | 74.5% | 100% | 2.5 s | 109k / 7.3k |
 | 2 | realistic buyer/supplier | extract-v1 | 96.7% | 100% | 74.5% | 100% | 2.6 s | 110k / 7.0k |
 | 3 | realistic buyer/supplier | extract-v2 | 96.7% | 100% | 74.5% | 100% | 2.4 s | 114k / 6.6k |
+| 4 | scans of run 3's documents (no text layer) | extract-v2 | 96.4% | 100% | 74.5% | 100% | 2.3 s | 78k / 6.7k |
 
-Perfect-reader ceiling on these answer keys: 96.7%. Every other field scored 100% in runs 2–3.
+Perfect-reader ceiling on these answer keys: 96.7%. Every other field scored 100% in runs 2–3. Run 4's
+only extra error is one PO number misread on a scan (`PO-3004` → `PQ-3004`); see the change log.
 
 **Model selection (proposal, with Jijuan).** Run the command once per candidate
 model on the development cases only, then record the results here:
@@ -196,6 +200,7 @@ layouts fairly, render every case in both (`--layout`) and evaluate each folder.
 | 2026-11-16 | First real run (claude-sonnet-5-5, 26 rendered documents): every call failed, 0 tokens used, and the issue only said `ModelCallError`. A direct API call showed HTTP 400 `` `temperature` is deprecated for this model ``. | Stop sending temperature by default (optional `MATCHLEDGER_TEMPERATURE`). Copy the provider's error type and message into the issue. | Calls go through; future failures name their cause. |
 | 2026-11-16 | Every PDF triggered `incorrect startxref pointer` warnings on Windows, because Git turned the PDFs' line endings into CRLF and shifted their internal offsets. | `.gitattributes` marks PDF and image files as binary. pypdf repair warnings are hidden. | Files arrive byte-identical on every OS, which duplicate detection by file hash depends on. |
 | 2026-11-16 | First successful run, prompt `extract-v1` (claude-sonnet-5-5, 26 documents): **96.2%** field accuracy; 100% valid JSON on the first try; 0 failures; median 2.5 s per document; 109k input / 7.3k output tokens. Every field was 100% except `unit` (74.5%, the 12 unprinted units, which matches the perfect-reader ceiling) and `supplier_id` (92.3%): **2 of 7 purchase orders came back with no supplier** (case-001 classic, case-002 compact). On those test POs the supplier's name was the letterhead and nothing was labelled "Supplier", but a real PO's letterhead is the buyer. The model's reading was reasonable and the test documents were unrealistic; the 5 POs it "got right" only matched because of that unrealistic layout. | (1) Test documents: POs now carry the buyer's letterhead and a labelled `Supplier:`; invoices show `Bill to:` and delivery notes `Deliver to:` with the buyer, a realistic distractor. (2) Prompt `extract-v2` defines the supplier on each document type and forbids returning the buyer, bill-to or deliver-to company. v1 is still selectable (`MATCHLEDGER_PROMPT=extract-v1`), so both prompts can be compared on the same new documents. | Same model, new documents: `extract-v1` 96.7%, `extract-v2` **96.7%** (supplier 100% with both; 100% valid JSON; 0 failures; only the 12 `unit_missing` remain). This is the perfect-reader ceiling, so the remaining gap is the answer-key unit question, not the model. The realistic documents closed the supplier gap; v2 made no measurable difference on this set and is kept as an explicit rule. Caveat: 26 documents, 7 POs. |
+| 2026-11-16 | Scan run (`eval/rendered-scan`: rotated, blurred, speckled PNGs, no text layer; extract-v2): **96.4%**, nearly the same as clean PDFs, with 31% fewer input tokens. One error: case-104's PO number `PO-3004` read as **`PQ-3004`**. **Nothing flagged it**: header fields have no quoted row to check, and scans have no text layer (`evidence_unverified` on all 26). | `crosscheck.py`: after a case is extracted, every PO number referenced on an invoice or delivery note is compared with the purchase orders. A match only after look-alike characters (O/Q/D/0, I/L/1, S/5, B/8, Z/2) are treated as equal raises `po_number_possible_misread` on both documents; no match at all raises `po_reference_not_found`. Nothing is corrected. The evaluation now reports **`silent_error_documents`**: documents with a wrong field and no review issue. | The misread becomes a review issue instead of a silent error (test reproduces this case). To be confirmed by re-running the scan set. |
 
 ## Open decisions for the team
 
