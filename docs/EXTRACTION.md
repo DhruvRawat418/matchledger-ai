@@ -145,18 +145,30 @@ on the same documents for a controlled before/after. Output folders are named
 | 3 | realistic buyer/supplier | extract-v2 | 96.7% | 100% | 74.5% | 100% | 2.4 s | 114k / 6.6k |
 | 4 | scans of run 3's documents (no text layer) | extract-v2 | 96.4% | 100% | 74.5% | 100% | 2.3 s | 78k / 6.7k |
 | 5 | scans, with cross-document check | extract-v2 | 96.4% | 100% | 74.5% | 100% | 2.2 s | 78k / 6.1k |
+| 6 | realistic PDFs, **claude-haiku-5-5** | extract-v2 | 96.7% | 100% | 74.5% | 100% | 2.5 s | 114k / 12.6k |
+| 7 | scans, **claude-haiku-5-5**, cross-document check | extract-v2 | 96.7% | 100% | 74.5% | 100% | 2.6 s | 78k / 14.2k |
 
 Perfect-reader ceiling on these answer keys: 96.7%. Every other field scored 100% in runs 2–3. Run 4's
 only extra error is one PO number misread on a scan (`PO-3004` → `PQ-3004`); see the change log.
 Run 5 repeated the misread, and the cross-document check flagged it: 0 silent-error documents,
-needs-review rate 38% (19% without scans).
+needs-review rate 38% (19% without scans). Runs 1–5 use claude-sonnet-5-5.
 
 **Model selection (proposal, with Jijuan).** Run the command once per candidate
 model on the development cases only, then record the results here:
 
-| Model identifier | Provider | Field accuracy | Valid JSON 1st try | Median / p95 latency | Cost per doc | Chosen |
-| --- | --- | --- | --- | --- | --- | --- |
-| | | | | | | |
+| Model identifier | Provider | Accuracy, PDFs / scans | Silent errors (scans) | Valid JSON 1st try | Median / p95 latency (PDFs) | Tokens per doc in / out (PDFs) | Chosen |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| claude-sonnet-5-5 | Anthropic | 96.7% / 96.4% (misread PO-3004 as PQ-3004 on both scan runs) | 1 without the cross-check, 0 with it | 100% | 2.4 s / 6.9 s | 4.4k / 0.25k | |
+| claude-haiku-5-5 | Anthropic | 96.7% / 96.7% | 0 | 100% | 2.5 s / 3.6 s | 4.4k / 0.48k | **yes (proposed, 2026-11-17)** |
+
+Both models reach the answer-key ceiling (96.7%) on the PDFs. Haiku also reached it on
+the scans, where Sonnet repeated one PO-number misread. Haiku is the lowest-cost tier in
+the Claude Console and had a lower worst-case latency, although it writes about twice as
+many output tokens. **Proposal: claude-haiku-5-5**, keeping the cross-document check,
+because any model can misread a scan. Caveats: this is one error on one field of 26
+documents, so it shows the two are comparable, not that Haiku is better. The choice is
+to be confirmed with Jijuan and checked once on the held-out set. Other providers
+(OpenAI, Gemini) need a teammate's key and run with the same command.
 
 The held-out cases stay unused until the prompt and model are frozen.
 
