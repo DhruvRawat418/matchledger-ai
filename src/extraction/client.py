@@ -10,7 +10,14 @@ from src.extraction.pages import Page
 
 
 class ModelCallError(RuntimeError):
-    """Provider/network failure. Messages must not include keys or document text."""
+    """Provider/network failure. Messages must not include keys or document text.
+
+    `safe_detail` is set only by the adapters in providers.py, from the provider's
+    structured error fields, and is the only part copied into an outcome."""
+
+    def __init__(self, message: str = "", safe_detail: str | None = None):
+        super().__init__(message)
+        self.safe_detail = safe_detail
 
 
 @dataclass(frozen=True)

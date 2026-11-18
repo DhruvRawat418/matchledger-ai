@@ -6,7 +6,7 @@ import json
 import httpx
 import pytest
 
-from src.extraction import FakeModelClient, ModelCallError, Page, load_pages
+from src.extraction import ExtractionRequest, FakeModelClient, ModelCallError, Page, extract_document, load_pages
 from src.extraction.evaluate import evaluate, summarize, write_outputs
 from src.extraction.providers import AnthropicClient, GeminiClient, OpenAIClient, client_from_env
 
@@ -34,7 +34,7 @@ def test_openai_request_and_reply():
     reply = call(client)
     body = json.loads(seen[0].content)
     assert seen[0].headers["authorization"] == f"Bearer {KEY}"
-    assert body["model"] == "model-x" and body["temperature"] == 0.0
+    assert body["model"] == "model-x" and "temperature" not in body  # Not sent unless configured.
     assert body["response_format"] == {"type": "json_object"}
     assert body["messages"][1]["content"][0]["image_url"]["url"].startswith("data:image/png;base64,")
     assert (reply.text, reply.usage) == ("{\"a\":1}", {"input_tokens": 7, "output_tokens": 3})
@@ -81,6 +81,36 @@ def test_network_failure_is_model_call_error(cls):
         call(cls("m", api_key=KEY, transport=httpx.MockTransport(boom)))
 
 
+def test_temperature_sent_only_when_configured():
+    seen = []
+    reply = {"content": [{"type": "text", "text": "{}"}]}
+    call(AnthropicClient("m", api_key=KEY, temperature=0.0, transport=mock(reply, seen=seen)))
+    assert json.loads(seen[0].content)["temperature"] == 0.0
+
+
+def test_provider_error_message_reaches_the_outcome_but_not_the_key():
+    """Regression for the first real run (2026-11-16): all 26 documents failed with
+    a bare 'HTTP 400' because the model rejects `temperature`. The provider's own
+    message must now be visible in the outcome, so the cause is clear."""
+    error = {"type": "error", "error": {"type": "invalid_request_error",
+                                        "message": "`temperature` is deprecated for this model."}}
+    client = AnthropicClient("m", api_key=KEY, transport=mock(error, status=400))
+    with pytest.raises(ModelCallError) as info:
+        call(client)
+    assert "deprecated" in str(info.value) and "invalid_request_error" in info.value.safe_detail
+
+    from src.extraction import ExtractionRequest, extract_document
+    request = ExtractionRequest(case_id="c", revision=1, document_id="d", file_path="x.pdf")
+    outcome = asyncio.run(extract_document(request, client, pages=[PAGE], max_attempts=1))
+    assert outcome.document is None
+    assert "HTTP 400" in outcome.issues[0].message and "deprecated" in outcome.issues[0].message
+
+    leaky = {"error": {"type": "authentication_error", "message": f"bad key {KEY}"}}
+    with pytest.raises(ModelCallError) as info:
+        call(AnthropicClient("m", api_key=KEY, transport=mock(leaky, status=401)))
+    assert KEY not in str(info.value) and "authentication_error" in str(info.value)
+
+
 def test_empty_reply_is_model_call_error():
     with pytest.raises(ModelCallError):
         call(AnthropicClient("m", api_key=KEY, transport=mock({"content": []})))
@@ -92,6 +122,9 @@ def test_client_from_env(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", KEY)
     client = client_from_env()
     assert isinstance(client, AnthropicClient) and client.model_id == "some-model"
+    assert client.temperature is None
+    monkeypatch.setenv("MATCHLEDGER_TEMPERATURE", "0")
+    assert client_from_env().temperature == 0.0
     monkeypatch.delenv("ANTHROPIC_API_KEY")
     with pytest.raises(ValueError, match="ANTHROPIC_API_KEY"):
         client_from_env()
@@ -213,3 +246,39 @@ def test_scan_variant_has_no_text_layer(tmp_path):
     assert len(scans) == 3
     pages = load_pages(scans[0])
     assert pages[0].media_type == "image/png" and pages[0].text is None
+
+
+@pytest.mark.parametrize("layout", ["classic", "compact"])
+def test_purchase_order_shows_buyer_letterhead_and_labelled_supplier(tmp_path, layout):
+    """Real purchase orders are issued by the buyer. The first real run showed an
+    unlabelled supplier on a PO is ambiguous (2 of 7 POs had no supplier read)."""
+    pytest.importorskip("reportlab")
+    from src.extraction.render import BUYER, render_cases
+
+    render_cases([_render_case()], tmp_path, layout=layout)
+    po = load_pages(tmp_path / "case-r" / "case-r-po.pdf")[0].text
+    receipt = load_pages(tmp_path / "case-r" / "case-r-rcv-a.pdf")[0].text
+    assert BUYER["name"].casefold() in po.casefold()
+    assert "Supplier:" in po and "Synthetic Office Supply Co." in po
+    assert "Deliver to:" in receipt and BUYER["name"] in receipt
+
+
+def test_prompt_version_selectable_and_recorded(monkeypatch):
+    from src.extraction.prompt import DEFAULT_PROMPT_VERSION, PROMPTS, active_prompt
+
+    assert DEFAULT_PROMPT_VERSION == "extract-v2"
+    assert "the supplier is the company the\n   order is addressed to" in PROMPTS["extract-v2"]
+    assert "supplier_name:" not in PROMPTS["extract-v1"]  # v1 kept unchanged for comparisons
+    request = ExtractionRequest(case_id="c", revision=1, document_id="d", file_path="x.pdf")
+    reply = json.dumps({"document_type": "invoice", "business_document_number": "I-1", "supplier_name": None,
+                        "referenced_po_number": None, "currency": "USD", "line_items": [{
+                            "description": "Lamp", "sku": None, "quantity": "1", "unit": "each",
+                            "unit_price": "1.00", "evidence_page": 1, "evidence_text": "Lamp 1 each 1.00"}]})
+    for version in ("extract-v1", "extract-v2"):
+        monkeypatch.setenv("MATCHLEDGER_PROMPT", version)
+        client = FakeModelClient([reply])
+        outcome = asyncio.run(extract_document(request, client, pages=[PAGE]))
+        assert outcome.prompt_version == version and client.calls[0]["system"] == PROMPTS[version]
+    monkeypatch.setenv("MATCHLEDGER_PROMPT", "extract-v9")
+    with pytest.raises(ValueError):
+        active_prompt()

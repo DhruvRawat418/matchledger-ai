@@ -35,6 +35,11 @@ SUPPLIER_NAMES = {
     "SUP-NORTHWIND": "Northwind Traders",
     "SUP-SYNTH": "Synthetic Office Supply Co.",
 }
+# The company using MatchLedger: it issues purchase orders and receives invoices
+# and deliveries. Printed so documents look real: a purchase order's letterhead is
+# the buyer (supplier labelled separately); invoices show it as bill-to and
+# delivery notes as deliver-to. It must never be extracted as the supplier.
+BUYER = {"name": "Northside Facilities Group", "address": "45 Campus Road, Ithaca, NY 14853"}
 LAYOUTS = ("classic", "compact")
 TITLES = {"purchase_order": "PURCHASE ORDER", "invoice": "INVOICE", "receipt": "DELIVERY NOTE"}
 NUMBER_LABELS = {"purchase_order": "PO number", "invoice": "Invoice number", "receipt": "Delivery note"}
@@ -88,8 +93,14 @@ def render_document(doc: ExtractedDocument, po_number: str | None, layout: str, 
     pdf = canvas.Canvas(str(path), pagesize=letter, invariant=1)
     pdf.setTitle(f"{TITLES[doc.document_type]} {doc.business_document_number or ''}".strip())
     width, height = letter
+    supplier = supplier_name(doc.supplier_id)
+    is_po = doc.document_type == "purchase_order"
     meta = {
-        "name": supplier_name(doc.supplier_id),
+        # Letterhead: the issuer. The buyer issues purchase orders; the supplier the rest.
+        "name": BUYER["name"] if is_po else supplier,
+        "address": BUYER["address"] if is_po else "1200 Commerce Way, Ithaca, NY 14850",
+        "party_label": "Supplier" if is_po else ("Bill to" if doc.document_type == "invoice" else "Deliver to"),
+        "party": supplier if is_po else BUYER["name"],
         "title": TITLES[doc.document_type],
         "number": doc.business_document_number,
         "date": _doc_date(doc),
@@ -111,11 +122,16 @@ def _classic(pdf, width, height, doc, meta, rows, page, page_count):
         pdf.setFont("Helvetica-Bold", 16)
         pdf.drawString(left, y, meta["name"])
     pdf.setFont("Helvetica", 9)
-    pdf.drawString(left, y - 14, "1200 Commerce Way, Ithaca, NY 14850")
+    pdf.drawString(left, y - 14, meta["address"])
     pdf.setFont("Helvetica-Bold", 18)
     pdf.drawRightString(right, y, meta["title"])
     y -= 46
     pdf.setFont("Helvetica", 10)
+    if meta["party"]:
+        pdf.drawString(left, y, f"{meta['party_label']}:")
+        pdf.setFont("Helvetica-Bold", 10)
+        pdf.drawString(left, y - 14, meta["party"])
+        pdf.setFont("Helvetica", 10)
     details = [(NUMBER_LABELS[doc.document_type], meta["number"]), ("Date", meta["date"]),
                ("Purchase order", meta["po"]), ("Currency", meta["currency"])]
     for label, value in details:
@@ -159,6 +175,9 @@ def _compact(pdf, width, height, doc, meta, rows, page, page_count):
              meta["date"], meta["currency"]]
     pdf.drawString(left, y, " | ".join(p for p in parts if p))
     pdf.drawRightString(width - 48, y, f"p.{page}/{page_count}")
+    if meta["party"]:
+        y -= 13
+        pdf.drawString(left, y, f"{meta['party_label']}: {meta['party']}")
     y -= 30
     pdf.setFont("Courier", 10)
     for number, text in enumerate(rows, start=1):

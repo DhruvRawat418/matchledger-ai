@@ -6,7 +6,13 @@ variables (see .env.example):
 
     MATCHLEDGER_PROVIDER=openai | anthropic | gemini
     MATCHLEDGER_MODEL=<exact model identifier, recorded in every outcome>
+    MATCHLEDGER_TEMPERATURE=0   (optional; omitted by default, see below)
     OPENAI_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY
+
+Temperature is not sent unless set: some current models reject the parameter
+(first real run, 2026-11-16: every call failed with HTTP 400 "temperature is
+deprecated for this model"). Run-to-run variation is measured with
+`evaluate --repeat` instead of being assumed away.
 
 Keys are read here and sent only in request headers. They never go into prompts,
 logs, outcomes or exceptions.
@@ -31,12 +37,12 @@ class _HttpClient:
     provider = "base"
     key_env = ""
 
-    def __init__(self, model_id: str, api_key: str | None = None, temperature: float | None = 0.0,
+    def __init__(self, model_id: str, api_key: str | None = None, temperature: float | None = None,
                  transport: httpx.AsyncBaseTransport | None = None):
         if not model_id:
             raise ValueError("A model identifier is required")
         self.model_id = model_id
-        self.temperature = temperature  # 0 for repeatable runs; None if a model rejects it
+        self.temperature = temperature  # None: provider default (some models reject the parameter)
         self._api_key = api_key or os.environ.get(self.key_env)
         if not self._api_key:
             raise ValueError(f"Set {self.key_env} (in .env, never in code or Git)")
@@ -52,12 +58,32 @@ class _HttpClient:
         except httpx.HTTPError as exc:
             raise ModelCallError(f"{self.provider} request failed ({type(exc).__name__})") from None
         if response.status_code != 200:
-            # Status code only: provider error bodies can echo the request.
-            raise ModelCallError(f"{self.provider} returned HTTP {response.status_code}")
+            detail = self._error_detail(response)
+            raise ModelCallError(f"{self.provider} returned HTTP {response.status_code}{detail}",
+                                 safe_detail=f"HTTP {response.status_code}{detail}")
         try:
             return response.json()
         except ValueError:
             raise ModelCallError(f"{self.provider} returned a non-JSON response") from None
+
+
+    def _error_detail(self, response: httpx.Response) -> str:
+        """The provider's short error type and message (e.g. 'invalid_request_error:
+        `temperature` is deprecated'), which say what to fix. Only the structured
+        error.message field is used, never the raw body; it is cut to 200 characters
+        and dropped if it contains the key."""
+        try:
+            error = response.json().get("error")
+        except (ValueError, AttributeError):
+            return ""
+        if not isinstance(error, dict):
+            return ""
+        kind = str(error.get("type") or error.get("status") or error.get("code") or "")[:60]
+        message = str(error.get("message") or "")[:200]
+        if self._api_key and self._api_key in message:
+            message = ""
+        text = ": ".join(part for part in (kind, message) if part)
+        return f" ({text})" if text else ""
 
 
 class OpenAIClient(_HttpClient):
@@ -134,6 +160,9 @@ def client_from_env(**kwargs):
     provider = os.environ.get("MATCHLEDGER_PROVIDER", "").strip().lower()
     if provider not in PROVIDERS:
         raise ValueError(f"Set MATCHLEDGER_PROVIDER to one of: {', '.join(PROVIDERS)}")
+    temperature = os.environ.get("MATCHLEDGER_TEMPERATURE", "").strip()
+    if temperature and "temperature" not in kwargs:
+        kwargs["temperature"] = float(temperature)
     return PROVIDERS[provider](os.environ.get("MATCHLEDGER_MODEL", "").strip(), **kwargs)
 
 
