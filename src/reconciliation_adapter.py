@@ -3,6 +3,7 @@
 Uses accepted PO-line mappings from matching; explicit identity conflicts still block.
 Raw documents and match methods are preserved. The engine computes all amounts.
 """
+import re
 from collections import defaultdict
 from src.matching import identity_conflict
 from decimal import Decimal
@@ -79,6 +80,33 @@ def _issue(code, lines, explanation):
     return {'code': code, 'lines': lines, 'expected': None, 'observed': None, 'explanation': explanation}
 
 
+def _product(line):
+    """How a person recognizes a line's product: its printed SKU, else its description, else its line ID."""
+    if line.sku is not None and line.sku.strip():
+        return line.sku.strip()
+    if line.description is not None and line.description.strip():
+        return f'"{line.description.strip()}"'
+    return f'line {line.line_id}'
+
+
+def _numbers(text):
+    return sorted(set(re.findall(r'\d+(?:\.\d+)?', text or '')))
+
+
+def _identity_conflict_reason(src_doc, src, po_doc, target):
+    """Say which product information conflicts. Mirrors src.matching.identity_conflict, which only answers yes/no."""
+    if src.sku and target.sku and normalize_sku(src.sku) != normalize_sku(target.sku):
+        return (f'{_where(src_doc, src)} has SKU {src.sku.strip()}, but its selected {_where(po_doc, target)} '
+                f'has SKU {target.sku.strip()}.')
+    a, b = _numbers(src.description), _numbers(target.description)
+    if a and b and a != b:
+        return (f'{_where(src_doc, src)} is described as "{src.description.strip()}", but its selected '
+                f'{_where(po_doc, target)} is "{target.description.strip()}"; the numbers in the descriptions '
+                f'differ ({", ".join(a)} vs {", ".join(b)}), so they may be different sizes or models.')
+    return (f'{_where(src_doc, src)} conflicts with the product on its selected {_where(po_doc, target)} '
+            f'({_product(src)} vs {_product(target)}).')
+
+
 def _input_issues(docs, matches, po, invoices, receipts):
     """Blocking problems, in stages. Each issue names its exact document and line.
 
@@ -144,12 +172,30 @@ def _input_issues(docs, matches, po, invoices, receipts):
         po_doc, target = by_ref[(m.selected_po_line.document_id, m.selected_po_line.line_id)]
         if identity_conflict(src, target):
             issues.append(_issue('unmatched_item', [_ref(src_doc, src), _ref(po_doc, target)],
-                                 f'{_where(src_doc, src)} has SKU {src.sku}, but its selected {_where(po_doc, target)} '
-                                 f'has SKU {target.sku}.'))
+                                 _identity_conflict_reason(src_doc, src, po_doc, target)))
         elif normalize_unit(src.unit) != normalize_unit(target.unit):
             issues.append(_issue('unit_mismatch', [_ref(src_doc, src), _ref(po_doc, target)],
                                  f'{_where(src_doc, src)} is in "{src.unit}" but {_where(po_doc, target)} is in '
                                  f'"{target.unit}"; units are not converted.'))
+    if issues:
+        return issues
+
+    # Stage 4: the Stage 2 rule for repeated products on one receipt, applied to accepted matches. Lines without
+    # a printed SKU can still be matched to the same PO line; the engine cannot hold two lines for one product on
+    # a delivery, and summing them here would be a new policy, so a person combines or corrects them.
+    selected = {(m.source.document_id, m.source.line_id): m.selected_po_line.line_id for m in matches}
+    po_lines = {l.line_id: l for l in po.line_items}
+    for d in receipts:
+        lines_by_po_line = defaultdict(list)
+        for l in d.line_items:
+            lines_by_po_line[selected[(d.document_id, l.line_id)]].append(l)
+        for po_line_id, lines in lines_by_po_line.items():
+            if len(lines) > 1:
+                target = po_lines[po_line_id]
+                ids = ', '.join(l.line_id for l in lines)
+                issues.append(_issue('unmatched_item', [*(_ref(d, l) for l in lines), _ref(po, target)],
+                    f'{_where(d)} lines {ids} are all matched to {_where(po, target)} (product {_product(target)}); '
+                    'repeated products on one receipt are not supported yet; combine or correct the lines.'))
     return issues
 
 
@@ -181,6 +227,8 @@ async def reconcile_worker(state):
     # Engine SKUs represent accepted PO-line identities, not invented extracted SKUs.
     # The original state, source text, match methods and evidence remain unchanged.
     engine_ids = {line.line_id: f'PO-LINE-{index}' for index, line in enumerate(po.line_items, start=1)}
+    # Engine IDs never reach people: every message shows the PO line's printed SKU or description instead.
+    labels = {engine_ids[line.line_id]: _product(line) for line in po.line_items}
     mapping = {(m.source.document_id, m.source.line_id): engine_ids[m.selected_po_line.line_id] for m in matches}
     docs = [d.model_copy(deep=True) for d in docs]
     for d in docs:
@@ -216,7 +264,7 @@ async def reconcile_worker(state):
             if len(lines) > 1:
                 ids = ', '.join(l.line_id for l in lines)
                 review.append(_issue('duplicate_document', [_ref(inv, l) for l in lines],
-                    f'[POSSIBLE_REPEATED_LINE] {_where(inv)} lines {ids} are identical ({normalize_sku(lines[0].sku)}, '
+                    f'[POSSIBLE_REPEATED_LINE] {_where(inv)} lines {ids} are identical ({labels[lines[0].sku]}, '
                     f'{lines[0].quantity} {lines[0].unit} at {lines[0].unit_price}); all are counted. Confirm they are '
                     'separate charges, not a repeated line.'))
 
@@ -238,7 +286,8 @@ async def reconcile_worker(state):
         lines = _finding_lines(finding, po, invoices, counted_receipts)
         where = '; '.join(f'{r["document_id"]} line {r["line_id"]}' for r in lines)
         mapped.append({'code': code, 'lines': lines, 'expected': _text(finding.expected),
-            'observed': _text(finding.actual), 'explanation': f'[{finding.type.value}] {finding.message} (lines: {where})',
+            'observed': _text(finding.actual),
+            'explanation': f'[{finding.type.value}] {_display(finding, labels)} (lines: {where})',
             'calculation': finding.calculation})
 
     # Totals come straight from the engine; the adapter only formats them (no arithmetic here).
@@ -282,6 +331,14 @@ def _finding_lines(finding, po, invoices, counted_receipts):
                 continue  # only the invoice line(s) charging the flagged price
             lines.append(_ref(d, l))
     return lines
+
+
+def _display(finding, labels):
+    """The engine message with its leading engine SKU ("PO-LINE-2: ...") replaced by the product people know."""
+    prefix = f'{finding.sku}:'
+    if finding.sku in labels and finding.message.startswith(prefix):
+        return labels[finding.sku] + finding.message[len(prefix) - 1:]
+    return finding.message
 
 
 def _text(value):
