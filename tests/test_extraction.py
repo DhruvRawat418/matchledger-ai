@@ -184,7 +184,7 @@ def test_cited_page_must_exist():
 def test_scanned_page_is_marked_unverified_not_failed():
     outcome, _ = run([reply()], page_text=None)
     assert outcome.document is not None
-    assert [(i.code, i.severity) for i in outcome.issues] == [("evidence_unverified", "info")]
+    assert [(i.code, i.severity) for i in outcome.issues] == [("evidence_unverified", "review")]
 
 
 # ------------------------------------------------------------------ safety

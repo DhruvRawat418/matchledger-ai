@@ -1,0 +1,147 @@
+{
+  "extraction_answer_key_version": "1.1",
+  "case_id": "case-104",
+  "categories": [
+    "identical",
+    "price_error",
+    "duplicate_document",
+    "revised_document"
+  ],
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 1,
+      "document_id": "case-104-po-3004",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3004",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "45.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | $45.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 1,
+      "document_id": "case-104-inv-9901a",
+      "document_type": "invoice",
+      "business_document_number": "INV-9901",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-104-po-3004",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "47.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | $47.50"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 1,
+      "document_id": "case-104-rcv-9901",
+      "document_type": "receipt",
+      "business_document_number": "DN-9901",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-104-po-3004",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | received"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 2,
+      "document_id": "case-104-inv-9901b",
+      "document_type": "invoice",
+      "business_document_number": "INV-9901",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-104-po-3004",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "47.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | $47.50"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-104",
+      "revision": 3,
+      "document_id": "case-104-inv-9901c",
+      "document_type": "invoice",
+      "business_document_number": "INV-9901",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-104-po-3004",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Office chair, standard",
+          "sku": "CHR-STD",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "45.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CHR-STD | Office chair, standard | 10 each | $45.00"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

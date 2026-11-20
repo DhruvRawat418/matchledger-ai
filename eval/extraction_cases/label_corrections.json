@@ -1,0 +1,107 @@
+{
+  "changes": [
+    {
+      "document_id": "case-001-rcv-0001",
+      "line_id": "1",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-001-rcv-0002",
+      "line_id": "1",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-inv-7781-r1",
+      "line_id": "1",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-inv-7781-r1",
+      "line_id": "2",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-inv-7781-r1",
+      "line_id": "3",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-inv-7781-r1",
+      "line_id": "4",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-rcv-3301",
+      "line_id": "1",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-rcv-3301",
+      "line_id": "2",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-rcv-3301",
+      "line_id": "3",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-inv-7781-r2",
+      "line_id": "1",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-inv-7781-r2",
+      "line_id": "2",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    },
+    {
+      "document_id": "case-002-inv-7781-r2",
+      "line_id": "3",
+      "field": "unit",
+      "old": "each",
+      "new": null,
+      "reason": "No quantity unit printed in the original PDF row or column header."
+    }
+  ],
+  "source_pdf_sha256": {
+    "case-001-rcv-0001": "6a0e93376a677adfb3da211b022f0e4430c60e2397a1e8f5648926c477ee9e7a",
+    "case-001-rcv-0002": "ebadfe44515ebcc8a2bab56270ce1601070dcbe4419ea949faacbe0a872340e0",
+    "case-002-inv-7781-r1": "1c6e3b23c0f22c5c1b7864da1458c509663acf1bb34477983bc43b2d6fee6892",
+    "case-002-inv-7781-r2": "f5187562b19ac541e3975e72f9dda3f8db1d82423b07358d315761c0baaccd7f",
+    "case-002-rcv-3301": "69fd885b847c62884c204581e280fa91b828cf7757efba82d57ecf74da18872b"
+  }
+}

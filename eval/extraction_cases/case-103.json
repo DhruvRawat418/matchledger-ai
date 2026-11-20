@@ -1,0 +1,176 @@
+{
+  "extraction_answer_key_version": "1.1",
+  "case_id": "case-103",
+  "categories": [
+    "synonym",
+    "lookalike",
+    "price_error"
+  ],
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-103",
+      "revision": 1,
+      "document_id": "case-103-po-3003",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3003",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24in Monitor",
+          "sku": "MON-24",
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MON-24 | 24in Monitor | 5 each | $150.00"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "27in Monitor",
+          "sku": "MON-27",
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": "210.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MON-27 | 27in Monitor | 3 each | $210.00"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "Notebook computer, 14 inch",
+          "sku": "NBK-14",
+          "quantity": "2",
+          "unit": "each",
+          "unit_price": "899.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "NBK-14 | Notebook computer, 14 inch | 2 each | $899.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-103",
+      "revision": 1,
+      "document_id": "case-103-inv-8301",
+      "document_type": "invoice",
+      "business_document_number": "INV-8301",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-103-po-3003",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Display, 24 in",
+          "sku": null,
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Display, 24 in | 5 each | $150.00"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Monitor, 27 inch",
+          "sku": null,
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": "210.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Monitor, 27 inch | 3 each | $210.00"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "14in laptop",
+          "sku": null,
+          "quantity": "2",
+          "unit": "each",
+          "unit_price": "949.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "14in laptop | 2 each | $949.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-103",
+      "revision": 1,
+      "document_id": "case-103-rcv-8301",
+      "document_type": "receipt",
+      "business_document_number": "DN-8301",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-103-po-3003",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24-inch LED screen",
+          "sku": null,
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24-inch LED screen | 5 each | received"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "27 in. monitor",
+          "sku": null,
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "27 in. monitor | 3 each | received"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "laptop 14 inch",
+          "sku": null,
+          "quantity": "2",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "laptop 14 inch | 2 each | received"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "case_id": "scan-101",
+  "revision": 1,
+  "supplier_directory": {
+    "Acme Displays Inc.": "SUP-ACME",
+    "Northwind Traders": "SUP-NORTHWIND",
+    "Synthetic Office Supply Co.": "SUP-SYNTH"
+  },
+  "documents": [
+    {
+      "document_id": "case-101-po-3001",
+      "document_type": "purchase_order",
+      "file_path": "../eval/rendered-scan/case-101/case-101-po-3001.png"
+    },
+    {
+      "document_id": "case-101-inv-8101",
+      "document_type": "invoice",
+      "file_path": "../eval/rendered-scan/case-101/case-101-inv-8101.png"
+    },
+    {
+      "document_id": "case-101-rcv-8101",
+      "document_type": "receipt",
+      "file_path": "../eval/rendered-scan/case-101/case-101-rcv-8101.png"
+    }
+  ]
+}

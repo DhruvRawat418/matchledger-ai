@@ -178,7 +178,7 @@ def _build(request: ExtractionRequest, model: ModelDocument, pages: list[Page]):
 
     if unverified:
         issues.append(_issue("evidence_unverified", f"{unverified} line(s) come from pages without a "
-                             "text layer; quotes could not be checked against the page", severity="info"))
+                             "text layer; a staff member must verify extracted fields against the image", severity="review"))
 
     # --- header fields
     number = clean_text(model.business_document_number)
