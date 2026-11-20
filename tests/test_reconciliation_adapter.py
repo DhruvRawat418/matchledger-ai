@@ -62,7 +62,10 @@ def test_unit_mismatch_blocks():
 def test_ai_match_does_not_silently_become_exact():
     state = inputs()
     state['matches'][0]['method'] = 'llm'
-    assert run(state)['status'] == 'blocked'
+    before = deepcopy(state)
+    assert run(state)['status'] == 'clean'
+    assert state == before
+    assert state['matches'][0]['method'] == 'llm'
 
 
 def test_wrong_sku_link_blocked():

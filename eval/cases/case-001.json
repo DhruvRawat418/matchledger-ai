@@ -1,0 +1,207 @@
+{
+  "ground_truth_version": "0.1",
+  "case_id": "case-001",
+  "categories": ["synonym", "partial_delivery", "quantity_error"],
+  "description": "Demo case. 20 monitors ordered and invoiced, 18 received; the remaining 2 arrive on a second receipt. Supplier describes the item as a 'display' with no SKU.",
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-001",
+      "revision": 1,
+      "document_id": "case-001-po-1001",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-1001",
+      "supplier_id": "SUP-ACME",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24-inch monitor",
+          "sku": "MON-24",
+          "quantity": "20",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [{"page": 1, "text": "MON-24 24-inch monitor 20 each $150.00"}]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-001",
+      "revision": 1,
+      "document_id": "case-001-inv-5001",
+      "document_type": "invoice",
+      "business_document_number": "INV-5001",
+      "supplier_id": "SUP-ACME",
+      "purchase_order_id": "case-001-po-1001",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24in display",
+          "sku": null,
+          "quantity": "20",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [{"page": 1, "text": "24in display 20 ea 150.00"}]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-001",
+      "revision": 1,
+      "document_id": "case-001-rcv-0001",
+      "document_type": "receipt",
+      "business_document_number": "DN-0001",
+      "supplier_id": "SUP-ACME",
+      "purchase_order_id": "case-001-po-1001",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24in display",
+          "sku": null,
+          "quantity": "18",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [{"page": 1, "text": "24in display  Qty received: 18"}]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-001",
+      "revision": 2,
+      "document_id": "case-001-rcv-0002",
+      "document_type": "receipt",
+      "business_document_number": "DN-0002",
+      "supplier_id": "SUP-ACME",
+      "purchase_order_id": "case-001-po-1001",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24in display",
+          "sku": null,
+          "quantity": "2",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [{"page": 1, "text": "24in display  Qty received: 2"}]
+        }
+      ]
+    }
+  ],
+  "line_tags": [
+    {"line": {"document_id": "case-001-inv-5001", "line_id": "1"}, "match_category": "synonym"},
+    {"line": {"document_id": "case-001-rcv-0001", "line_id": "1"}, "match_category": "synonym"},
+    {"line": {"document_id": "case-001-rcv-0002", "line_id": "1"}, "match_category": "synonym"}
+  ],
+  "revisions": [
+    {
+      "revision": 1,
+      "event": "PO, invoice and first receipt uploaded",
+      "document_ids": ["case-001-po-1001", "case-001-inv-5001", "case-001-rcv-0001"],
+      "expected_matches": [
+        {
+          "case_id": "case-001",
+          "revision": 1,
+          "source": {"document_id": "case-001-inv-5001", "line_id": "1"},
+          "candidate_po_lines": [{"document_id": "case-001-po-1001", "line_id": "1"}],
+          "selected_po_line": {"document_id": "case-001-po-1001", "line_id": "1"},
+          "decision": "matched",
+          "method": "human",
+          "explanation": "24in display is the same product as the 24-inch monitor (MON-24)",
+          "evidence": [{"page": 1, "text": "24in display 20 ea 150.00"}]
+        },
+        {
+          "case_id": "case-001",
+          "revision": 1,
+          "source": {"document_id": "case-001-rcv-0001", "line_id": "1"},
+          "candidate_po_lines": [{"document_id": "case-001-po-1001", "line_id": "1"}],
+          "selected_po_line": {"document_id": "case-001-po-1001", "line_id": "1"},
+          "decision": "matched",
+          "method": "human",
+          "explanation": "24in display is the same product as the 24-inch monitor (MON-24)",
+          "evidence": [{"page": 1, "text": "24in display  Qty received: 18"}]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-001",
+        "revision": 1,
+        "status": "needs_review",
+        "discrepancies": [
+          {
+            "code": "quantity_mismatch",
+            "lines": [
+              {"document_id": "case-001-po-1001", "line_id": "1"},
+              {"document_id": "case-001-inv-5001", "line_id": "1"},
+              {"document_id": "case-001-rcv-0001", "line_id": "1"}
+            ],
+            "expected": "20",
+            "observed": "18",
+            "explanation": "20 ordered and 20 invoiced, but only 18 received"
+          }
+        ],
+        "checked_lines": [
+          {"document_id": "case-001-po-1001", "line_id": "1"},
+          {"document_id": "case-001-inv-5001", "line_id": "1"},
+          {"document_id": "case-001-rcv-0001", "line_id": "1"}
+        ]
+      }
+    },
+    {
+      "revision": 2,
+      "event": "Second receipt uploaded for the remaining 2 monitors",
+      "document_ids": ["case-001-po-1001", "case-001-inv-5001", "case-001-rcv-0001", "case-001-rcv-0002"],
+      "expected_matches": [
+        {
+          "case_id": "case-001",
+          "revision": 2,
+          "source": {"document_id": "case-001-inv-5001", "line_id": "1"},
+          "candidate_po_lines": [{"document_id": "case-001-po-1001", "line_id": "1"}],
+          "selected_po_line": {"document_id": "case-001-po-1001", "line_id": "1"},
+          "decision": "matched",
+          "method": "human",
+          "explanation": "24in display is the same product as the 24-inch monitor (MON-24)",
+          "evidence": [{"page": 1, "text": "24in display 20 ea 150.00"}]
+        },
+        {
+          "case_id": "case-001",
+          "revision": 2,
+          "source": {"document_id": "case-001-rcv-0001", "line_id": "1"},
+          "candidate_po_lines": [{"document_id": "case-001-po-1001", "line_id": "1"}],
+          "selected_po_line": {"document_id": "case-001-po-1001", "line_id": "1"},
+          "decision": "matched",
+          "method": "human",
+          "explanation": "24in display is the same product as the 24-inch monitor (MON-24)",
+          "evidence": [{"page": 1, "text": "24in display  Qty received: 18"}]
+        },
+        {
+          "case_id": "case-001",
+          "revision": 2,
+          "source": {"document_id": "case-001-rcv-0002", "line_id": "1"},
+          "candidate_po_lines": [{"document_id": "case-001-po-1001", "line_id": "1"}],
+          "selected_po_line": {"document_id": "case-001-po-1001", "line_id": "1"},
+          "decision": "matched",
+          "method": "human",
+          "explanation": "24in display is the same product as the 24-inch monitor (MON-24)",
+          "evidence": [{"page": 1, "text": "24in display  Qty received: 2"}]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-001",
+        "revision": 2,
+        "status": "clean",
+        "discrepancies": [],
+        "checked_lines": [
+          {"document_id": "case-001-po-1001", "line_id": "1"},
+          {"document_id": "case-001-inv-5001", "line_id": "1"},
+          {"document_id": "case-001-rcv-0001", "line_id": "1"},
+          {"document_id": "case-001-rcv-0002", "line_id": "1"}
+        ]
+      }
+    }
+  ]
+}

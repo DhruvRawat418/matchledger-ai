@@ -1,0 +1,8 @@
+case_id,level,categories,revisions,description
+case-001,demo,synonym;partial_delivery;quantity_error,2,"Demo: 20 monitors ordered/invoiced, 18 then 2 received; supplier calls them 'display'"
+case-002,mixed,identical;formatting;synonym;lookalike;not_on_po;price_error;revised_document,2,"Smoothie mix + 24in/27in monitors; overbilled price and unordered shipping fee, then corrected invoice"
+case-101,exact,identical,1,"Fully correct control case: SKUs everywhere, everything agrees; tests false alerts"
+case-102,fuzzy,formatting;price_error;quantity_error,1,"Formatting noise only; paper line overbilled (5.95 vs 5.10) and short-delivered (30 of 40)"
+case-103,llm,synonym;lookalike;price_error,1,"Synonyms (Display 24 in / 24-inch LED screen = 24in Monitor; laptop=notebook) + 24/27in look-alike trap; laptop overbilled (949 vs 899)"
+case-104,human-error,identical;price_error;duplicate_document;revised_document,4,"Duplicate upload of INV-9901, then conflicting correction left alongside the original; resolved by rev 4"
+case-105,human-error,identical;duplicate_document,3,"Same delivery note DN-7701 uploaded twice: double-count trap (20 vs 10 received); duplicate retired by rev 3"

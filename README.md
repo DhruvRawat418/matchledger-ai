@@ -2,14 +2,15 @@
 
 Procurement and invoice reconciliation assistant — team starter.
 
-**Current branch: `Dhruv-orchestration`.** This is a draft contract foundation,
-not the completed application. There is a LangGraph skeleton with synthetic workers, but no live agents,
-dashboard or Docker container yet. No API key is needed for this example.
+**Current branch: `Dhruv-integration`.** The agents now share one package layout.
+Start with [the integration guide](docs/INTEGRATION.md) for offline checks and the
+live upload command. This is an integration build, not the finished dashboard or
+Docker submission. Runtime AI requires your own configured provider credentials.
 
 ## Run locally (Python 3.11 or newer)
 
 ```bash
-git clone --branch Dhruv-orchestration https://github.com/DhruvRawat418/matchledger-ai.git
+git clone --branch Dhruv-integration https://github.com/DhruvRawat418/matchledger-ai.git
 cd matchledger-ai
 python3 -m venv .venv
 source .venv/bin/activate
@@ -30,7 +31,7 @@ Create your own branch from this starter once it is available remotely:
 
 ```bash
 git fetch origin
-git switch -c YourName-component origin/Dhruv-orchestration
+git switch -c YourName-component origin/Dhruv-integration
 ```
 
 Keep work off `main` until the team finalizes the project. Coordinate contract
@@ -47,8 +48,8 @@ python -m demo.run_workflow --scenario short-delivery
 See [the orchestration guide](docs/ORCHESTRATION.md) for routing, worker adapters
 and current limitations. These commands run real LangGraph with predefined
 extraction/matching/review responses with Matthew’s real reconciliation engine.
-The engine calculates totals internally; the graph currently exposes discrepancies,
-not those totals. No live AI is connected.
+The engine exposes discrepancies and calculation evidence. These legacy demo commands
+still use synthetic extraction/matching/review; use the integration guide for live uploads.
 
 ## Saved cases and correction demo
 

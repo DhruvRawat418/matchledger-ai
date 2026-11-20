@@ -27,3 +27,4 @@ class WorkflowState(TypedDict, total=False):
     issues: list[dict]
     stages: list[str]
     corrections: list[dict]
+    extraction_notices: list[dict]

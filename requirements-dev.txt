@@ -1,2 +1,4 @@
 -r requirements.txt
 pytest>=8,<10
+# Builds small PDFs in extraction tests
+reportlab>=4,<6

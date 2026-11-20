@@ -1,0 +1,919 @@
+{
+  "ground_truth_version": "0.1",
+  "case_id": "case-002",
+  "categories": [
+    "identical",
+    "formatting",
+    "synonym",
+    "lookalike",
+    "not_on_po",
+    "price_error",
+    "revised_document"
+  ],
+  "description": "Mixed order of smoothie mix and two monitor sizes. Original invoice overbills the 24in monitor and adds an unordered shipping fee; the supplier then sends a corrected invoice.",
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-002",
+      "revision": 1,
+      "document_id": "case-002-po-2001",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-2001",
+      "supplier_id": "SUP-NORTHWIND",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Strawberry Banana Smoothie Mix, 2 lb",
+          "sku": "SBM-2LB",
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "8.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SBM-2LB Strawberry Banana Smoothie Mix, 2 lb 10 each $8.50"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "24in Monitor",
+          "sku": "MON-24",
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MON-24 24in Monitor 5 each $150.00"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "27in Monitor",
+          "sku": "MON-27",
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": "210.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MON-27 27in Monitor 3 each $210.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-002",
+      "revision": 1,
+      "document_id": "case-002-inv-7781-r1",
+      "document_type": "invoice",
+      "business_document_number": "INV-7781",
+      "supplier_id": "SUP-NORTHWIND",
+      "purchase_order_id": "case-002-po-2001",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "STRAWBERRY_BANANA_SB 2LB",
+          "sku": null,
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "8.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "STRAWBERRY_BANANA_SB 2LB 10 8.50"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Monitor, 27 inch",
+          "sku": null,
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": "210.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Monitor, 27 inch 3 210.00"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "24 inch display",
+          "sku": null,
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": "155.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24 inch display 5 155.00"
+            }
+          ]
+        },
+        {
+          "line_id": "4",
+          "description": "Expedited shipping",
+          "sku": null,
+          "quantity": "1",
+          "unit": "each",
+          "unit_price": "25.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Expedited shipping 1 25.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-002",
+      "revision": 1,
+      "document_id": "case-002-rcv-3301",
+      "document_type": "receipt",
+      "business_document_number": "DN-3301",
+      "supplier_id": "SUP-NORTHWIND",
+      "purchase_order_id": "case-002-po-2001",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "strawberry-banana smoothie mix 2 lb",
+          "sku": null,
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "strawberry-banana smoothie mix 2 lb  received 10"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "27in Monitor",
+          "sku": null,
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "27in Monitor  received 3"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "24in Monitor",
+          "sku": null,
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24in Monitor  received 5"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-002",
+      "revision": 2,
+      "document_id": "case-002-inv-7781-r2",
+      "document_type": "invoice",
+      "business_document_number": "INV-7781",
+      "supplier_id": "SUP-NORTHWIND",
+      "purchase_order_id": "case-002-po-2001",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "STRAWBERRY_BANANA_SB 2LB",
+          "sku": null,
+          "quantity": "10",
+          "unit": "each",
+          "unit_price": "8.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "STRAWBERRY_BANANA_SB 2LB 10 8.50"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Monitor, 27 inch",
+          "sku": null,
+          "quantity": "3",
+          "unit": "each",
+          "unit_price": "210.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Monitor, 27 inch 3 210.00"
+            }
+          ]
+        },
+        {
+          "line_id": "3",
+          "description": "24 inch display",
+          "sku": null,
+          "quantity": "5",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24 inch display 5 150.00"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "line_tags": [
+    {
+      "line": {
+        "document_id": "case-002-inv-7781-r1",
+        "line_id": "1"
+      },
+      "match_category": "formatting"
+    },
+    {
+      "line": {
+        "document_id": "case-002-inv-7781-r1",
+        "line_id": "2"
+      },
+      "match_category": "lookalike"
+    },
+    {
+      "line": {
+        "document_id": "case-002-inv-7781-r1",
+        "line_id": "3"
+      },
+      "match_category": "synonym"
+    },
+    {
+      "line": {
+        "document_id": "case-002-inv-7781-r1",
+        "line_id": "4"
+      },
+      "match_category": "not_on_po"
+    },
+    {
+      "line": {
+        "document_id": "case-002-inv-7781-r2",
+        "line_id": "1"
+      },
+      "match_category": "formatting"
+    },
+    {
+      "line": {
+        "document_id": "case-002-inv-7781-r2",
+        "line_id": "2"
+      },
+      "match_category": "lookalike"
+    },
+    {
+      "line": {
+        "document_id": "case-002-inv-7781-r2",
+        "line_id": "3"
+      },
+      "match_category": "synonym"
+    },
+    {
+      "line": {
+        "document_id": "case-002-rcv-3301",
+        "line_id": "1"
+      },
+      "match_category": "formatting"
+    },
+    {
+      "line": {
+        "document_id": "case-002-rcv-3301",
+        "line_id": "2"
+      },
+      "match_category": "identical"
+    },
+    {
+      "line": {
+        "document_id": "case-002-rcv-3301",
+        "line_id": "3"
+      },
+      "match_category": "identical"
+    }
+  ],
+  "revisions": [
+    {
+      "revision": 1,
+      "event": "PO, original invoice and receipt uploaded",
+      "document_ids": [
+        "case-002-po-2001",
+        "case-002-inv-7781-r1",
+        "case-002-rcv-3301"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-002",
+          "revision": 1,
+          "source": {
+            "document_id": "case-002-inv-7781-r1",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 1 (SBM-2LB); differs only in formatting",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "STRAWBERRY_BANANA_SB 2LB 10 8.50"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 1,
+          "source": {
+            "document_id": "case-002-inv-7781-r1",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "3"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 3 (MON-27), not the 24in monitor on PO line 2",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Monitor, 27 inch 3 210.00"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 1,
+          "source": {
+            "document_id": "case-002-inv-7781-r1",
+            "line_id": "3"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 2 (MON-24); display is a synonym for monitor",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24 inch display 5 155.00"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 1,
+          "source": {
+            "document_id": "case-002-inv-7781-r1",
+            "line_id": "4"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": null,
+          "decision": "unmatched",
+          "method": "human",
+          "explanation": "Shipping charge does not appear on the purchase order",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Expedited shipping 1 25.00"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 1,
+          "source": {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 1 (SBM-2LB); differs only in formatting",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "strawberry-banana smoothie mix 2 lb  received 10"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 1,
+          "source": {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "3"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same text as PO line 3 (MON-27)",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "27in Monitor  received 3"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 1,
+          "source": {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "3"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same text as PO line 2 (MON-24)",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24in Monitor  received 5"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-002",
+        "revision": 1,
+        "status": "needs_review",
+        "discrepancies": [
+          {
+            "code": "price_mismatch",
+            "lines": [
+              {
+                "document_id": "case-002-po-2001",
+                "line_id": "2"
+              },
+              {
+                "document_id": "case-002-inv-7781-r1",
+                "line_id": "3"
+              }
+            ],
+            "expected": "150.00",
+            "observed": "155.00",
+            "explanation": "24in monitor billed at $155.00 per unit; PO price is $150.00"
+          },
+          {
+            "code": "unmatched_item",
+            "lines": [
+              {
+                "document_id": "case-002-inv-7781-r1",
+                "line_id": "4"
+              }
+            ],
+            "expected": null,
+            "observed": "25.00",
+            "explanation": "Invoice bills $25.00 expedited shipping that was not on the PO"
+          }
+        ],
+        "checked_lines": [
+          {
+            "document_id": "case-002-po-2001",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-002-po-2001",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-002-po-2001",
+            "line_id": "3"
+          },
+          {
+            "document_id": "case-002-inv-7781-r1",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-002-inv-7781-r1",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-002-inv-7781-r1",
+            "line_id": "3"
+          },
+          {
+            "document_id": "case-002-inv-7781-r1",
+            "line_id": "4"
+          },
+          {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "3"
+          }
+        ]
+      }
+    },
+    {
+      "revision": 2,
+      "event": "Supplier sends corrected invoice INV-7781 (price fixed, shipping removed)",
+      "document_ids": [
+        "case-002-po-2001",
+        "case-002-inv-7781-r2",
+        "case-002-rcv-3301"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-002",
+          "revision": 2,
+          "source": {
+            "document_id": "case-002-inv-7781-r2",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 1 (SBM-2LB); differs only in formatting",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "STRAWBERRY_BANANA_SB 2LB 10 8.50"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 2,
+          "source": {
+            "document_id": "case-002-inv-7781-r2",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "3"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 3 (MON-27), not the 24in monitor on PO line 2",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Monitor, 27 inch 3 210.00"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 2,
+          "source": {
+            "document_id": "case-002-inv-7781-r2",
+            "line_id": "3"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 2 (MON-24); display is a synonym for monitor",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24 inch display 5 150.00"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 2,
+          "source": {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 1 (SBM-2LB); differs only in formatting",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "strawberry-banana smoothie mix 2 lb  received 10"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 2,
+          "source": {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "3"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same text as PO line 3 (MON-27)",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "27in Monitor  received 3"
+            }
+          ]
+        },
+        {
+          "case_id": "case-002",
+          "revision": 2,
+          "source": {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "3"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "2"
+            },
+            {
+              "document_id": "case-002-po-2001",
+              "line_id": "3"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-002-po-2001",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same text as PO line 2 (MON-24)",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24in Monitor  received 5"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-002",
+        "revision": 2,
+        "status": "clean",
+        "discrepancies": [],
+        "checked_lines": [
+          {
+            "document_id": "case-002-po-2001",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-002-po-2001",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-002-po-2001",
+            "line_id": "3"
+          },
+          {
+            "document_id": "case-002-inv-7781-r2",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-002-inv-7781-r2",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-002-inv-7781-r2",
+            "line_id": "3"
+          },
+          {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-002-rcv-3301",
+            "line_id": "3"
+          }
+        ]
+      }
+    }
+  ]
+}

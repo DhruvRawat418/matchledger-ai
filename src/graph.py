@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Awaitable, Callable
 from langgraph.graph import END, START, StateGraph
 from src.contracts import ExtractedDocument, MatchResult, ReconciliationResult, validate_handoff
+from src.extraction_adapter import ExtractionBatch
 from src.state import ReviewResult, WorkflowRequest, WorkflowState
 
 Worker = Callable[[WorkflowState], Awaitable[object]]
@@ -46,14 +47,29 @@ def build_graph(workers: Workers):
             try:
                 raw = await getattr(workers, stage)(deepcopy(state))
                 if stage == "extract":
-                    docs = [ExtractedDocument.model_validate(x) for x in raw]
+                    batch = ExtractionBatch.model_validate(raw) if isinstance(raw, dict) else ExtractionBatch(documents=raw)
+                    docs = batch.documents
+                    for doc in docs:
+                        _same_revision(doc, state)
+                    if docs:
+                        validate_handoff(docs, [])
+                    notices = [i.model_dump() for i in batch.issues]
+                    if any(i.severity == "review" for i in batch.issues):
+                        return {"documents": [d.model_dump() for d in docs], "extraction_notices": notices,
+                                "status": "needs_correction", "stages": stages,
+                                "issues": [i.model_dump() for i in batch.issues if i.severity == "review"]}
                     validate_handoff(docs, [])
                     for doc in docs:
                         _same_revision(doc, state)
                     kinds = [d.document_type for d in docs]
+                    if kinds.count("invoice") > 1:
+                        return {"documents": [d.model_dump() for d in docs], "extraction_notices": notices,
+                                "status": "needs_correction", "stages": stages,
+                                "issues": [{"code": "duplicate_document", "owner": "human",
+                                    "explanation": "Multiple invoices supplied. Confirm the active version before calculation."}]}
                     if kinds.count("purchase_order") != 1 or kinds.count("invoice") != 1 or not 1 <= kinds.count("receipt") <= 3:
                         raise ValueError("Expected one PO, one invoice and one to three receipts")
-                    update = {"documents": [d.model_dump() for d in docs]}
+                    update = {"documents": [d.model_dump() for d in docs], "extraction_notices": notices}
                 elif stage == "match":
                     docs = [ExtractedDocument.model_validate(x) for x in state["documents"]]
                     matches = [MatchResult.model_validate(x) for x in raw]

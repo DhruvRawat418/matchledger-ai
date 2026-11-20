@@ -82,3 +82,74 @@ and receipt `purchase_order_id` is an explicitly resolved internal PO document I
 not a model-invented ID or unverified source business number. Intake/linking must
 resolve this from source references. Null blocks computation; no fallback values.
 `src/reconciliation_adapter.py` currently supports exact SKU matches only.
+
+## PROPOSED: reconciliation output extension (pending Dhruv + Maia approval)
+
+> **Status: proposal on `feature/reconciliation-worker`, not yet approved.**
+> Needs review by Dhruv (contracts and graph) and Maia (display). Until it is
+> approved, treat this section as a draft. Every rule above still applies.
+
+**What changes in `src/contracts.py`:** three optional fields are added.
+Nothing is renamed or removed. Each new field defaults to empty, so any
+producer, test or stored case that leaves them out still validates. All
+numbers follow the existing rules: nonnegative decimal strings, and `null`
+means unknown, never zero.
+
+| Field | Where | Meaning |
+| --- | --- | --- |
+| `quantities` | `ReconciliationResult`, list, default `[]` | One `QuantityTotals` per PO line: `po_line` (a line reference), `ordered`, `received`, `invoiced`, plus `calculation`, e.g. `received = 18 [receipt-1] + 2 [receipt-2] = 20`. Empty means the totals were not calculated (for example, a blocked case). |
+| `amounts` | `ReconciliationResult`, default `null` | `AmountTotals` at PO prices: `currency`, `billed`, `supported`, `unsupported`, `unbilled`. `null` means not calculated. |
+| `calculation` | `Discrepancy`, default `null` | Plain-text arithmetic behind the finding, e.g. `billed 20 - received 18 = 2 units x PO price 125.50 = 251.00`. Present on every finding that involves arithmetic. Negative numbers may appear inside this sentence as words; they are never sent as number fields. |
+
+**Amounts, all nonnegative:**
+
+- `billed` = total on the invoice.
+- `supported` = PO-priced value of the goods that were both ordered **and** received.
+- `unsupported` = how much the invoice bills **above** `supported`. It is `0`
+  when the invoice bills at or below `supported`.
+- `unbilled` = how much of `supported` the invoice does **not** bill. Causes
+  include under-billing, a lower invoice price, or billing not yet complete.
+  It is `0` otherwise.
+- At most one of `unsupported` and `unbilled` is above zero.
+- These are review figures. They are never payment instructions.
+
+Worked example: PO 20 at 125.50, 18 received, 20 invoiced. Billed 2510.00,
+supported 2259.00, unsupported 251.00, unbilled 0.
+
+**Expected / observed rule.** This is a proposed wording of how the engine
+already behaves:
+
+> `expected` = the value from the **reference** document (the PO, or what was
+> actually received). `observed` = the value on the **document being checked**.
+
+| Engine finding (in the explanation prefix) | `code` | expected | observed |
+| --- | --- | --- | --- |
+| `MISSING_DELIVERY` | `quantity_mismatch` | ordered | received |
+| `OVER_DELIVERY` | `quantity_mismatch` | ordered | received |
+| `BILLED_EXCEEDS_RECEIVED` | `quantity_mismatch` | received | invoiced |
+| `BILLED_EXCEEDS_ORDERED` | `quantity_mismatch` | ordered | invoiced |
+| `UNDER_BILLED` | `quantity_mismatch` | lower of ordered and received | invoiced |
+| `PRICE_MISMATCH` | `price_mismatch` | PO unit price | invoice unit price |
+| `UNMATCHED_INVOICE_LINE` | `unmatched_item` | null | invoiced quantity |
+| `UNMATCHED_DELIVERY_LINE` | `unmatched_item` | null | received quantity |
+| `SUPPLIER_MISMATCH` | `supplier_mismatch` | null | null |
+| `CURRENCY_MISMATCH` | `missing_information` | null | null |
+| Adapter checks (blocked inputs, repeated receipts) | various | null | null |
+
+For the shared first example (20 ordered, 18 received, 20 invoiced), this gives
+two findings:
+
+- `MISSING_DELIVERY` with expected 20 and observed 18.
+- `BILLED_EXCEEDS_RECEIVED` with expected 18 and observed 20.
+
+The fixture's numbers (20 → 18) match the first finding. Its explanation text,
+"20 invoiced, 18 received", would read more accurately as "20 ordered, 18
+received". That rewording is suggested only; the fixture has not been changed.
+
+**Open points for Dhruv:**
+
+1. Should the graph also check that each `quantities[].po_line` refers to an
+   existing PO line, as it already does for `checked_lines`?
+2. Should `quantities` be required whenever the status is not `blocked`?
+
+Tests: `tests/test_reconciliation_output.py`.

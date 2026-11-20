@@ -1,0 +1,371 @@
+{
+  "ground_truth_version": "0.1",
+  "case_id": "case-102",
+  "categories": [
+    "formatting",
+    "price_error",
+    "quantity_error"
+  ],
+  "description": "Supplier reformats every description (case, underscores, suffixes, spacing); the paper line is overbilled and short-delivered.",
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-102",
+      "revision": 1,
+      "document_id": "case-102-po-3002",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3002",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Strawberry Banana Smoothie Mix, 2 lb",
+          "sku": "SBM-2LB",
+          "quantity": "12",
+          "unit": "each",
+          "unit_price": "8.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SBM-2LB | Strawberry Banana Smoothie Mix, 2 lb | 12 each | $8.50"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "A4 Copy Paper, 500 sheets",
+          "sku": "PPR-A4",
+          "quantity": "40",
+          "unit": "each",
+          "unit_price": "5.10",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "PPR-A4 | A4 Copy Paper, 500 sheets | 40 each | $5.10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-102",
+      "revision": 1,
+      "document_id": "case-102-inv-8201",
+      "document_type": "invoice",
+      "business_document_number": "INV-8201",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-102-po-3002",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "STRAWBERRY_BANANA_SB 2LB",
+          "sku": null,
+          "quantity": "12",
+          "unit": "each",
+          "unit_price": "8.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "STRAWBERRY_BANANA_SB 2LB | 12 each | $8.50"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "a4 copy-paper (500 Sheets) -NEW",
+          "sku": null,
+          "quantity": "40",
+          "unit": "each",
+          "unit_price": "5.95",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "a4 copy-paper (500 Sheets) -NEW | 40 each | $5.95"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-102",
+      "revision": 1,
+      "document_id": "case-102-rcv-8201",
+      "document_type": "receipt",
+      "business_document_number": "DN-8201",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-102-po-3002",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "strawberry banana smoothie mix 2lb",
+          "sku": null,
+          "quantity": "12",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "strawberry banana smoothie mix 2lb | 12 each | received"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "A4 copy paper 500sheets",
+          "sku": null,
+          "quantity": "30",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "A4 copy paper 500sheets | 30 each | received"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "line_tags": [
+    {
+      "line": {
+        "document_id": "case-102-inv-8201",
+        "line_id": "1"
+      },
+      "match_category": "formatting"
+    },
+    {
+      "line": {
+        "document_id": "case-102-inv-8201",
+        "line_id": "2"
+      },
+      "match_category": "formatting"
+    },
+    {
+      "line": {
+        "document_id": "case-102-rcv-8201",
+        "line_id": "1"
+      },
+      "match_category": "formatting"
+    },
+    {
+      "line": {
+        "document_id": "case-102-rcv-8201",
+        "line_id": "2"
+      },
+      "match_category": "formatting"
+    }
+  ],
+  "revisions": [
+    {
+      "revision": 1,
+      "event": "PO, invoice and receipt uploaded",
+      "document_ids": [
+        "case-102-po-3002",
+        "case-102-inv-8201",
+        "case-102-rcv-8201"
+      ],
+      "expected_matches": [
+        {
+          "case_id": "case-102",
+          "revision": 1,
+          "source": {
+            "document_id": "case-102-inv-8201",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-102-po-3002",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-102-po-3002",
+              "line_id": "2"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-102-po-3002",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 1 (SBM-2LB); differs only in case, underscores and the _SB suffix",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Same product as PO line 1 (SBM-2LB); differs only in case, underscores and the _SB suffix"
+            }
+          ]
+        },
+        {
+          "case_id": "case-102",
+          "revision": 1,
+          "source": {
+            "document_id": "case-102-inv-8201",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-102-po-3002",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-102-po-3002",
+              "line_id": "2"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-102-po-3002",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 2 (PPR-A4); differs only in punctuation and the -NEW suffix",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Same product as PO line 2 (PPR-A4); differs only in punctuation and the -NEW suffix"
+            }
+          ]
+        },
+        {
+          "case_id": "case-102",
+          "revision": 1,
+          "source": {
+            "document_id": "case-102-rcv-8201",
+            "line_id": "1"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-102-po-3002",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-102-po-3002",
+              "line_id": "2"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-102-po-3002",
+            "line_id": "1"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 1 (SBM-2LB); differs only in case, underscores and the _SB suffix",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Same product as PO line 1 (SBM-2LB); differs only in case, underscores and the _SB suffix"
+            }
+          ]
+        },
+        {
+          "case_id": "case-102",
+          "revision": 1,
+          "source": {
+            "document_id": "case-102-rcv-8201",
+            "line_id": "2"
+          },
+          "candidate_po_lines": [
+            {
+              "document_id": "case-102-po-3002",
+              "line_id": "1"
+            },
+            {
+              "document_id": "case-102-po-3002",
+              "line_id": "2"
+            }
+          ],
+          "selected_po_line": {
+            "document_id": "case-102-po-3002",
+            "line_id": "2"
+          },
+          "decision": "matched",
+          "method": "human",
+          "explanation": "Same product as PO line 2 (PPR-A4); differs only in punctuation and the -NEW suffix",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "Same product as PO line 2 (PPR-A4); differs only in punctuation and the -NEW suffix"
+            }
+          ]
+        }
+      ],
+      "expected_reconciliation": {
+        "case_id": "case-102",
+        "revision": 1,
+        "status": "needs_review",
+        "discrepancies": [
+          {
+            "code": "price_mismatch",
+            "lines": [
+              {
+                "document_id": "case-102-po-3002",
+                "line_id": "2"
+              },
+              {
+                "document_id": "case-102-inv-8201",
+                "line_id": "2"
+              }
+            ],
+            "expected": "5.10",
+            "observed": "5.95",
+            "explanation": "Copy paper billed at 5.95 per unit; PO price is 5.10"
+          },
+          {
+            "code": "quantity_mismatch",
+            "lines": [
+              {
+                "document_id": "case-102-po-3002",
+                "line_id": "2"
+              },
+              {
+                "document_id": "case-102-inv-8201",
+                "line_id": "2"
+              },
+              {
+                "document_id": "case-102-rcv-8201",
+                "line_id": "2"
+              }
+            ],
+            "expected": "40",
+            "observed": "30",
+            "explanation": "40 ordered and 40 invoiced, but only 30 received"
+          }
+        ],
+        "checked_lines": [
+          {
+            "document_id": "case-102-po-3002",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-102-po-3002",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-102-inv-8201",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-102-inv-8201",
+            "line_id": "2"
+          },
+          {
+            "document_id": "case-102-rcv-8201",
+            "line_id": "1"
+          },
+          {
+            "document_id": "case-102-rcv-8201",
+            "line_id": "2"
+          }
+        ]
+      }
+    }
+  ]
+}

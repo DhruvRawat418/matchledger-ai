@@ -1,4 +1,5 @@
 """Version 0.1 team interface draft. No extraction, model calls or arithmetic here."""
+from decimal import Decimal
 from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
@@ -69,9 +70,44 @@ class MatchResult(Contract):
 class Discrepancy(Contract):
     code: Literal["quantity_mismatch", "price_mismatch", "missing_information", "unmatched_item", "unit_mismatch", "duplicate_document", "supplier_mismatch"]
     lines: list[LineReference] = Field(min_length=1)
+    # Proposed rule (docs/DATA_CONTRACTS.md): expected = value from the reference
+    # document (PO, or what was received); observed = value on the document checked.
     expected: DecimalText | None
     observed: DecimalText | None
     explanation: Identifier
+    # PROPOSED, PENDING Dhruv + Maia approval: plain-text arithmetic behind this finding.
+    calculation: Identifier | None = None
+
+# PROPOSED EXTENSION, PENDING Dhruv + Maia approval (see docs/DATA_CONTRACTS.md).
+# Every field below is optional with an empty default, so producers and stored
+# cases that omit them stay valid. Existing fields are unchanged.
+class QuantityTotals(Contract):
+    """Ordered/received/invoiced for one PO line. null = not known, never zero."""
+    po_line: LineReference
+    ordered: DecimalText | None
+    received: DecimalText | None
+    invoiced: DecimalText | None
+    calculation: Identifier
+
+class AmountTotals(Contract):
+    """Invoice money at PO prices; all values nonnegative, per the team number rule.
+
+    supported   = PO-priced value of goods both ordered and received.
+    unsupported = amount billed ABOVE supported (0 if none).
+    unbilled    = amount of supported value NOT billed (0 if none).
+    At most one of unsupported/unbilled is above zero. Not a payment instruction.
+    """
+    currency: Literal["USD"]
+    billed: DecimalText
+    supported: DecimalText
+    unsupported: DecimalText
+    unbilled: DecimalText
+
+    @model_validator(mode="after")
+    def one_direction(self):
+        if Decimal(self.unsupported) > 0 and Decimal(self.unbilled) > 0:
+            raise ValueError("unsupported and unbilled cannot both be above zero")
+        return self
 
 class ReconciliationResult(Contract):
     case_id: Identifier
@@ -79,6 +115,9 @@ class ReconciliationResult(Contract):
     status: Literal["clean", "needs_review", "blocked"]
     discrepancies: list[Discrepancy]
     checked_lines: list[LineReference]
+    # PROPOSED, PENDING Dhruv + Maia approval. Empty/null = "not calculated" (e.g. blocked).
+    quantities: list[QuantityTotals] = Field(default_factory=list)
+    amounts: AmountTotals | None = None
 
     @model_validator(mode="after")
     def consistent_status(self):
@@ -86,6 +125,9 @@ class ReconciliationResult(Contract):
             raise ValueError("Clean requires checked lines and no discrepancies")
         if self.status != "clean" and not self.discrepancies:
             raise ValueError("Non-clean results must explain the blocking/review issue")
+        lines = [(q.po_line.document_id, q.po_line.line_id) for q in self.quantities]
+        if len(lines) != len(set(lines)):
+            raise ValueError("quantities must list each PO line at most once")
         return self
 
 
