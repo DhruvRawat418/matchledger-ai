@@ -1,0 +1,11 @@
+{
+  "documents": [
+    {
+      "action": "replace",
+      "document_id": "case-102-inv-8201-corrected",
+      "document_type": "invoice",
+      "file_path": "case-102-inv-8201-corrected.pdf",
+      "replaces": "case-102-inv-8201"
+    }
+  ]
+}
