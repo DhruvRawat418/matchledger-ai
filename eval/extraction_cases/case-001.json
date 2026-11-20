@@ -1,0 +1,119 @@
+{
+  "extraction_answer_key_version": "1.1",
+  "case_id": "case-001",
+  "categories": [
+    "synonym",
+    "partial_delivery",
+    "quantity_error"
+  ],
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-001",
+      "revision": 1,
+      "document_id": "case-001-po-1001",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-1001",
+      "supplier_id": "SUP-ACME",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24-inch monitor",
+          "sku": "MON-24",
+          "quantity": "20",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MON-24 24-inch monitor 20 each $150.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-001",
+      "revision": 1,
+      "document_id": "case-001-inv-5001",
+      "document_type": "invoice",
+      "business_document_number": "INV-5001",
+      "supplier_id": "SUP-ACME",
+      "purchase_order_id": "case-001-po-1001",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24in display",
+          "sku": null,
+          "quantity": "20",
+          "unit": "each",
+          "unit_price": "150.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24in display 20 ea 150.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-001",
+      "revision": 1,
+      "document_id": "case-001-rcv-0001",
+      "document_type": "receipt",
+      "business_document_number": "DN-0001",
+      "supplier_id": "SUP-ACME",
+      "purchase_order_id": "case-001-po-1001",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24in display",
+          "sku": null,
+          "quantity": "18",
+          "unit": null,
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24in display  Qty received: 18"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-001",
+      "revision": 2,
+      "document_id": "case-001-rcv-0002",
+      "document_type": "receipt",
+      "business_document_number": "DN-0002",
+      "supplier_id": "SUP-ACME",
+      "purchase_order_id": "case-001-po-1001",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "24in display",
+          "sku": null,
+          "quantity": "2",
+          "unit": null,
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "24in display  Qty received: 2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

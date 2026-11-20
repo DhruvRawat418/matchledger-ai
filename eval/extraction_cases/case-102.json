@@ -1,0 +1,134 @@
+{
+  "extraction_answer_key_version": "1.1",
+  "case_id": "case-102",
+  "categories": [
+    "formatting",
+    "price_error",
+    "quantity_error"
+  ],
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-102",
+      "revision": 1,
+      "document_id": "case-102-po-3002",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3002",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "Strawberry Banana Smoothie Mix, 2 lb",
+          "sku": "SBM-2LB",
+          "quantity": "12",
+          "unit": "each",
+          "unit_price": "8.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "SBM-2LB | Strawberry Banana Smoothie Mix, 2 lb | 12 each | $8.50"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "A4 Copy Paper, 500 sheets",
+          "sku": "PPR-A4",
+          "quantity": "40",
+          "unit": "each",
+          "unit_price": "5.10",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "PPR-A4 | A4 Copy Paper, 500 sheets | 40 each | $5.10"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-102",
+      "revision": 1,
+      "document_id": "case-102-inv-8201",
+      "document_type": "invoice",
+      "business_document_number": "INV-8201",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-102-po-3002",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "STRAWBERRY_BANANA_SB 2LB",
+          "sku": null,
+          "quantity": "12",
+          "unit": "each",
+          "unit_price": "8.50",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "STRAWBERRY_BANANA_SB 2LB | 12 each | $8.50"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "a4 copy-paper (500 Sheets) -NEW",
+          "sku": null,
+          "quantity": "40",
+          "unit": "each",
+          "unit_price": "5.95",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "a4 copy-paper (500 Sheets) -NEW | 40 each | $5.95"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-102",
+      "revision": 1,
+      "document_id": "case-102-rcv-8201",
+      "document_type": "receipt",
+      "business_document_number": "DN-8201",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-102-po-3002",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "strawberry banana smoothie mix 2lb",
+          "sku": null,
+          "quantity": "12",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "strawberry banana smoothie mix 2lb | 12 each | received"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "A4 copy paper 500sheets",
+          "sku": null,
+          "quantity": "30",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "A4 copy paper 500sheets | 30 each | received"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

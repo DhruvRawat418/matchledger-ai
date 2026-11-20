@@ -52,8 +52,9 @@ LLM adversarial review or permission to pay.
 
 For your own documents, copy the manifest and update its metadata. File paths
 are relative to the manifest file. Use fresh case IDs and correct revision numbers.
-The upload command writes a state snapshot; it does not register a saved SQLite
-case or implement a GUI correction action yet.
+The upload command writes a state snapshot. For saved SQLite cases and explicit
+source replacement, use [the document-resolution commands](DOCUMENT_RESOLUTION.md);
+GUI correction controls are still pending.
 
 ## Integration changes
 
@@ -83,10 +84,11 @@ model/prompt versions; no new live benchmark was run during this integration.
 
 Still required before a final submission:
 
-- Connect Maia's UI and saved-case upload/correction/retirement actions. Current
-  SQLite correction demo remains a synthetic receipt-quantity workflow.
-- Explicit replacement relationships and file fingerprints; unidentified changed
-  receipts must not be assumed to be independent deliveries.
+- Connect Maia's UI to the [saved document-resolution service](DOCUMENT_RESOLUTION.md).
+  Receipt addition, explicit invoice/receipt replacement, file fingerprints and
+  saved revision history are implemented. Live resolution verification and general
+  retirement/PO replacement actions remain pending. Unidentified changed receipts
+  must not be assumed to be independent deliveries.
 - Resolve evaluation PDFs that omit units while answer keys expect `each`.
   Never fill absent units just to improve a score.
 - Case 104 revisions 2/3 deliberately pause without totals. This differs from the

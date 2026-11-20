@@ -17,7 +17,7 @@ from pydantic import ValidationError
 from src.contracts import ExtractedDocument
 from src.extraction.client import ModelCallError, ModelClient
 from src.extraction.normalize import (NotANumber, clean_text, comparable, currency_code, decimal_text,
-                                      numbers_in, split_quantity_unit, unit_text)
+                                      numbers_in, split_quantity_unit, unit_text, receipt_description)
 from src.extraction.pages import Page, UnsupportedFile, load_pages
 from src.extraction.prompt import active_prompt, output_schema, user_message
 from src.extraction.schema import ExtractionIssue, ExtractionOutcome, ExtractionRequest, ModelDocument
@@ -124,6 +124,13 @@ def _build(request: ExtractionRequest, model: ModelDocument, pages: list[Page]):
         quantity, price = values["quantity"], values["unit_price"]
         unit = unit_text(unit_raw)
         description, sku = clean_text(row.description), clean_text(row.sku)
+        if doc_type == "receipt":
+            product = receipt_description(description, evidence, quantity, unit)
+            if product != description:
+                issues.append(_issue("description_columns_separated",
+                    "Separated product description from corroborated quantity/unit and received columns; original row retained in evidence.",
+                    severity="info", line_id=line_id, field="description"))
+                description = product
 
         if quantity is None and not any(i.line_id == line_id and i.field == "quantity" for i in issues):
             issues.append(_issue("missing_value", "Quantity is not printed or not legible",
@@ -171,7 +178,7 @@ def _build(request: ExtractionRequest, model: ModelDocument, pages: list[Page]):
 
     if unverified:
         issues.append(_issue("evidence_unverified", f"{unverified} line(s) come from pages without a "
-                             "text layer; quotes could not be checked against the page", severity="info"))
+                             "text layer; a staff member must verify extracted fields against the image", severity="review"))
 
     # --- header fields
     number = clean_text(model.business_document_number)

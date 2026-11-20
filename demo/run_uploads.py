@@ -16,10 +16,13 @@ from src.llm_matcher import AnthropicMatcher
 
 
 async def run(manifest):
+    return await run_data(json.loads(manifest.read_text()), manifest.parent)
+
+
+async def run_data(data, base_dir=Path(".")):
     load_dotenv()
-    data = json.loads(manifest.read_text())
     requests = [ExtractionRequest(case_id=data['case_id'], revision=data.get('revision', 1),
-                document_id=d['document_id'], file_path=manifest.parent / d['file_path'],
+                document_id=d['document_id'], file_path=base_dir / d['file_path'],
                 declared_type=d['document_type'], supplier_directory=data['supplier_directory'])
                 for d in data['documents']]
     matcher = AnthropicMatcher(model=os.environ['MATCHLEDGER_MATCH_MODEL']) if os.getenv('MATCHLEDGER_MATCH_MODEL') else None

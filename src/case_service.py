@@ -54,6 +54,8 @@ async def _execute(store, workers, version, record):
 
 async def resume_case(store, workers, case_id):
     version, record = store.load(case_id)
+    if record.get('kind') == 'document_case':
+        raise ValueError('Use retry_documents for a document case')
     if record['state']['status'] != 'running':
         raise ValueError('Only an interrupted running revision can be resumed')
     return await _execute(store, workers, version, record)
@@ -62,6 +64,8 @@ async def resume_case(store, workers, case_id):
 async def correct_receipt_quantity(store, workers, case_id, correction):
     correction = ReceiptQuantityCorrection.model_validate(correction)
     version, record = store.load(case_id)
+    if record.get('kind') == 'document_case':
+        raise ValueError('Use source-document changes for a document case')
     state = record['state']
     if state['status'] != 'needs_correction':
         raise ValueError('This case is not waiting for correction')

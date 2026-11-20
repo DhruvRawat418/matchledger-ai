@@ -1,0 +1,11 @@
+{
+  "documents": [
+    {
+      "action": "add",
+      "document_id": "case-102-rcv-8202",
+      "document_type": "receipt",
+      "file_path": "case-102-rcv-8202.pdf",
+      "replaces": null
+    }
+  ]
+}

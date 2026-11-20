@@ -1,0 +1,132 @@
+{
+  "extraction_answer_key_version": "1.1",
+  "case_id": "case-101",
+  "categories": [
+    "identical"
+  ],
+  "documents": [
+    {
+      "schema_version": "0.1",
+      "case_id": "case-101",
+      "revision": 1,
+      "document_id": "case-101-po-3001",
+      "document_type": "purchase_order",
+      "business_document_number": "PO-3001",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": null,
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "USB-C cable, 1m",
+          "sku": "CBL-USBC",
+          "quantity": "50",
+          "unit": "each",
+          "unit_price": "4.25",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CBL-USBC | USB-C cable, 1m | 50 each | $4.25"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Wireless mouse",
+          "sku": "MSE-WL",
+          "quantity": "25",
+          "unit": "each",
+          "unit_price": "12.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MSE-WL | Wireless mouse | 25 each | $12.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-101",
+      "revision": 1,
+      "document_id": "case-101-inv-8101",
+      "document_type": "invoice",
+      "business_document_number": "INV-8101",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-101-po-3001",
+      "currency": "USD",
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "USB-C cable, 1m",
+          "sku": "CBL-USBC",
+          "quantity": "50",
+          "unit": "each",
+          "unit_price": "4.25",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CBL-USBC | USB-C cable, 1m | 50 each | $4.25"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Wireless mouse",
+          "sku": "MSE-WL",
+          "quantity": "25",
+          "unit": "each",
+          "unit_price": "12.00",
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MSE-WL | Wireless mouse | 25 each | $12.00"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema_version": "0.1",
+      "case_id": "case-101",
+      "revision": 1,
+      "document_id": "case-101-rcv-8101",
+      "document_type": "receipt",
+      "business_document_number": "DN-8101",
+      "supplier_id": "SUP-SYNTH",
+      "purchase_order_id": "case-101-po-3001",
+      "currency": null,
+      "line_items": [
+        {
+          "line_id": "1",
+          "description": "USB-C cable, 1m",
+          "sku": "CBL-USBC",
+          "quantity": "50",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "CBL-USBC | USB-C cable, 1m | 50 each | received"
+            }
+          ]
+        },
+        {
+          "line_id": "2",
+          "description": "Wireless mouse",
+          "sku": "MSE-WL",
+          "quantity": "25",
+          "unit": "each",
+          "unit_price": null,
+          "evidence": [
+            {
+              "page": 1,
+              "text": "MSE-WL | Wireless mouse | 25 each | received"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
