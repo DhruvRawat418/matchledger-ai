@@ -43,8 +43,18 @@ _V2 = _V1.replace(
    identifiable, use null.
    referenced_po_number: the purchase-order number printed on an invoice or receipt.""")
 
-PROMPTS = {"extract-v1": _V1, "extract-v2": _V2}
-DEFAULT_PROMPT_VERSION = "extract-v2"
+# v3: live receipt copied quantity/status columns into product description.
+_V3 = _V2.replace(
+    "   sku: the printed item code, or null if the row has none.",
+    "   sku: the printed item code, or null if the row has none.\n"
+    "   description: product identity text only. Preserve sizes, model numbers and\n"
+    "   pack sizes, but exclude the row's quantity, unit price and delivery status.\n"
+    "   For 'A4 copy paper 500sheets | 10 each | received', description is\n"
+    "   'A4 copy paper 500sheets'; quantity is '10'; unit is 'each'.\n"
+    "   Keep the complete original row in evidence_text.")
+
+PROMPTS = {"extract-v1": _V1, "extract-v2": _V2, "extract-v3": _V3}
+DEFAULT_PROMPT_VERSION = "extract-v3"
 PROMPT_VERSION = DEFAULT_PROMPT_VERSION  # Kept for imports; use active_prompt().
 SYSTEM_PROMPT = PROMPTS[DEFAULT_PROMPT_VERSION]
 

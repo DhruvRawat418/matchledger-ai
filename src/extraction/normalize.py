@@ -89,3 +89,27 @@ def numbers_in(text: str) -> set[str]:
         except NotANumber:
             pass
     return found
+
+
+def receipt_description(description: str | None, evidence: str, quantity: str | None,
+                        unit: str | None) -> str | None:
+    """Separate a copied receipt row only when its explicit columns corroborate it.
+
+    Keep genuine product numerals (A4, 500 sheets, 27-inch). Never strip arbitrary
+    numbers. Original full-row evidence is retained by the caller.
+    """
+    if not description or description != evidence or quantity is None or unit is None:
+        return description
+    columns = [part.strip() for part in description.split('|')]
+    if len(columns) < 3 or columns[-1].casefold() != 'received':
+        return description
+    match = _QTY_WITH_UNIT.fullmatch(columns[-2])
+    if not match:
+        return description
+    try:
+        if Decimal(decimal_text(match.group(1))) != Decimal(quantity) or unit_text(match.group(2)) != unit:
+            return description
+    except (NotANumber, InvalidOperation):
+        return description
+    product = ' | '.join(columns[:-2]).strip()
+    return product or description

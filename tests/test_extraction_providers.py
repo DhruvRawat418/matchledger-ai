@@ -266,7 +266,7 @@ def test_purchase_order_shows_buyer_letterhead_and_labelled_supplier(tmp_path, l
 def test_prompt_version_selectable_and_recorded(monkeypatch):
     from src.extraction.prompt import DEFAULT_PROMPT_VERSION, PROMPTS, active_prompt
 
-    assert DEFAULT_PROMPT_VERSION == "extract-v2"
+    assert DEFAULT_PROMPT_VERSION == "extract-v3"
     assert "the supplier is the company the\n   order is addressed to" in PROMPTS["extract-v2"]
     assert "supplier_name:" not in PROMPTS["extract-v1"]  # v1 kept unchanged for comparisons
     request = ExtractionRequest(case_id="c", revision=1, document_id="d", file_path="x.pdf")
@@ -274,7 +274,7 @@ def test_prompt_version_selectable_and_recorded(monkeypatch):
                         "referenced_po_number": None, "currency": "USD", "line_items": [{
                             "description": "Lamp", "sku": None, "quantity": "1", "unit": "each",
                             "unit_price": "1.00", "evidence_page": 1, "evidence_text": "Lamp 1 each 1.00"}]})
-    for version in ("extract-v1", "extract-v2"):
+    for version in ("extract-v1", "extract-v2", "extract-v3"):
         monkeypatch.setenv("MATCHLEDGER_PROMPT", version)
         client = FakeModelClient([reply])
         outcome = asyncio.run(extract_document(request, client, pages=[PAGE]))

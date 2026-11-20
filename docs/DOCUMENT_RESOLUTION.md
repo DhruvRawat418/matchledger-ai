@@ -80,3 +80,17 @@ $85 -> $34 -> $0, immutable originals, persistence, stale/invalid requests, dupl
 uploads, tampered archives and failed-run retry. They do not establish live model
 quality. The new live resolution sequence must still be run and inspected by the
 team; the earlier live clean/discrepancy runs are separate evidence.
+
+## Live receipt-description regression (November 20)
+
+A live model response copied `A4 copy paper 500sheets | 10 each | received`
+into the description field. The matcher correctly refused the extra numeric
+identity attribute. Extraction prompt `extract-v3` now explicitly separates
+product text from quantity/status columns. A narrow deterministic normalization
+also separates a full copied receipt row only when its pipe-delimited quantity
+and unit agree with the extracted fields and its final column is `received`.
+The original evidence remains unchanged and an informational notice is recorded.
+Uncorroborated rows are not modified; product sizes and pack counts are retained.
+Regression tests show the received total is correctly handled while the price
+mismatch remains. A later explicit invoice replacement reruns all active files;
+prior failed matching outputs remain in revision history.
