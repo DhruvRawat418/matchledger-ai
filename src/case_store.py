@@ -23,6 +23,11 @@ class CaseStore:
             raise KeyError(f"Unknown case: {case_id}")
         return row[0], json.loads(row[1])
 
+    def list_ids(self):
+        """Case IDs, newest case first (for the local web app's case list)."""
+        with self._connect() as db:
+            return [row[0] for row in db.execute("SELECT case_id FROM cases ORDER BY rowid DESC")]
+
     def create(self, record):
         try:
             with self._connect() as db:
