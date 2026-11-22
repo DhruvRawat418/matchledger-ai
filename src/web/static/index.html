@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MatchLedger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Momo+Trust+Sans:wght@200..800&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="ml">
+  <aside class="side">
+    <a class="brand" href="#/"><span class="mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 8h14M5 12h14M5 16h8"/></svg></span>MatchLedger</a>
+    <nav class="navlist" aria-label="Workspace">
+      <a class="nav" data-nav="cases" href="#/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="grow">Cases</span><span class="count num" id="case-count">0</span></a>
+      <a class="nav" data-nav="new" href="#/new"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="grow">New case</span></a>
+    </nav>
+    <div class="navlist" id="recent"></div>
+    <div class="side-foot" id="mode"></div>
+  </aside>
+  <main class="main" id="main" tabindex="-1"></main>
+</div>
+<div id="dialog-root"></div>
+<div id="toast-root" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>

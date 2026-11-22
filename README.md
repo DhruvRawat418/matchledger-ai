@@ -51,6 +51,16 @@ extraction/matching/review responses with Matthew’s real reconciliation engine
 The engine exposes discrepancies and calculation evidence. These legacy demo commands
 still use synthetic extraction/matching/review; use the integration guide for live uploads.
 
+## Web app
+
+```bash
+python -m uvicorn src.web.app:app --port 8000
+```
+
+Upload a PO, invoice and receipt, run the checks, then add a receipt or replace
+the invoice and rerun. See [the web app guide](docs/WEB_APP.md). Without a
+configured extraction model it runs the bundled sample PDFs only.
+
 ## Saved cases and correction demo
 
 Follow [the saved-case guide](docs/SAVED_CASES.md) to create a case, reopen it,
