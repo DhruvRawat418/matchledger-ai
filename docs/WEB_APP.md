@@ -78,4 +78,22 @@ Data lives in `outputs/` (ignored by Git), or `MATCHLEDGER_DATA_DIR`.
   document, no stop, no confirming an uncertain match.
 - Upload document IDs are generated as `<case>-po`, `<case>-inv-N`,
   `<case>-rcv-N`. Results show the printed document numbers instead.
-- Not verified here: a live extraction run through the page.
+- This is a local single-operator app, without production authentication.
+
+## Scan verification
+
+Open a case paused for `evidence_unverified`, click **Verify scanned fields**, and compare every field with the archived source. Correct transcription errors only. Enter your name and notes, confirm the comparison, and save. This creates a new revision and reruns downstream checks without another model call. Other unresolved warnings remain blocking.
+
+The API exposes `GET /api/cases/{id}/scan-review` and `POST /api/cases/{id}/scan-review`. Stale revisions and unconfirmed packets are rejected.
+
+## Integration checks (November 22, 2026)
+
+- Full automated suite: 395 passed.
+- Browser sample correction: unsupported amount $85 → $34 → $0; revision 3 persisted after refresh, with the original invoice retained as replaced.
+- Live GPT-4.1-mini extraction through the web API: clean case reached human review, billed and supported $512.50.
+- Live scanned uploads paused before matching; the browser displayed the source/field review form. Confirmation and stale-review rejection are covered by API tests.
+- Review remains a deterministic boundary audit; passing checks is not payment approval.
+
+## Moving an existing local checkout
+
+If saved document links point to the old checkout, use `python -m demo.relocate_archive --help`. The relocation helper verifies archived file hashes and backs up the database before changing paths. Do not commit runtime databases, uploads, or `.env`.

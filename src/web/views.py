@@ -122,6 +122,7 @@ def case_view(record):
                        'text': issue.get('explanation') or ISSUE_LABELS.get(issue['code']) or _pretty(issue['code'])})
 
     events = {e['new_revision']: e for e in record.get('document_events', [])}
+    scan_events = {e['new_revision']: e for e in record.get('scan_reviews', [])}
     trail = [*(h['state'] for h in record.get('history', [])), state]
     revisions = []
     for old in trail:
@@ -133,6 +134,9 @@ def case_view(record):
                                            'type_label': TYPE_LABELS[c['document_type']], 'replaces': c.get('replaces'),
                                            'original_name': uploads.get(c['document_id'], {}).get('original_name')}
                                           for c in event['documents']]}
+        if old['revision'] in scan_events:
+            e = scan_events[old['revision']]
+            entry['scan_review'] = {k:e[k] for k in ('staff','reason','recorded_at')}
         revisions.append(entry)
 
     kinds = [uploads[i]['document_type'] for i in active if i in uploads]
@@ -143,6 +147,7 @@ def case_view(record):
             'reconciliation_status': rec.get('status'), 'findings': findings, 'items': items,
             'unmatched': unmatched, 'documents': documents, 'revisions': revisions,
             'semantic_matching': state.get('semantic_matching'),
-            'actions': {'add_receipt': idle and kinds.count('receipt') < 3,
+            'actions': {'verify_scans': state['status'] == 'needs_correction' and any(n.get('code') == 'evidence_unverified' for n in state.get('extraction_notices', [])),
+                        'add_receipt': idle and kinds.count('receipt') < 3,
                         'replace_invoice': idle and invoice_id is not None, 'active_invoice_id': invoice_id,
                         'retry': state['status'] in {'running', 'blocked'} and not rec}}

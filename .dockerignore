@@ -1,0 +1,11 @@
+.git
+.venv
+.env
+.env.*
+outputs
+uploads
+**/__pycache__
+**/*.pyc
+.pytest_cache
+**/*.sqlite*
+.DS_Store

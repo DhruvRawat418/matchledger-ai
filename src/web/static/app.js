@@ -70,7 +70,7 @@
     }).join('') : '';
     document.getElementById('mode').innerHTML = config.mode === 'live'
       ? '<span>Live extraction</span><span class="muted">' + esc(config.model || 'model not named') + (config.semantic_matching ? ' · semantic matching on' : '') + '</span>'
-      : '<span>Sample files only</span><span class="muted">No extraction model is configured, so only the bundled sample PDFs can be run.</span>';
+      : '<span>Sample files only</span><span class="muted">Sample mode uses bundled records; no model calls are made.</span>';
   }
   function setNav(name) {
     Array.prototype.forEach.call(document.querySelectorAll('[data-nav]'), function (a) { a.classList.toggle('on', a.getAttribute('data-nav') === name); });
@@ -113,7 +113,7 @@
       return '<div class="item"><div class="grow"><div style="font-weight:500">' + esc(s.label) + '</div><div class="muted small">' + esc(s.note) + '</div></div><button type="button" class="btn" data-sample="' + esc(s.id) + '"' + (busy ? ' disabled' : '') + '>Use these files</button></div>';
     }).join('');
     main.innerHTML = '<div class="view"><div class="head"><div><div class="eyebrow"><a href="#/">Cases</a><span>/</span><span>New case</span></div><h1 class="title">Upload the three documents to check.</h1>' +
-      '<p class="sub">' + (config.mode === 'live' ? 'Each file is read by the configured model, so a run uses your API account and can take a minute.' : 'No extraction model is configured, so this runs the bundled sample files only. Matching and the arithmetic are the real checks.') + '</p></div>' +
+      '<p class="sub">' + (config.mode === 'live' ? 'Each file is read by the configured model, so a run uses your API account and can take a minute.' : 'Sample mode runs the bundled sample files without model calls. Matching and the arithmetic are the real checks.') + '</p></div>' +
       '<button type="button" class="btn pri" id="run"' + (ready && !busy ? '' : ' disabled') + '>' + (busy ? icon('spin', 16, 'spin') + 'Running checks…' : icon('check') + 'Run checks') + '</button></div>' +
       (error ? '<div class="banner" role="alert">' + icon('alert', 18) + '<div class="grow">' + esc(error) + '</div></div>' : '') +
       (busy ? '<div class="banner info" role="status">' + icon('spin', 18, 'spin') + '<div class="grow">Reading the documents, matching items, comparing the numbers and reviewing the result. This page opens the case when the run is saved.</div></div>' : '') +
@@ -201,16 +201,18 @@
     }).join('') + '</div></div>';
     var history = '<div class="card"><div class="card-h">' + tile('clock', 'violet') + 'History</div><div style="padding:16px 0 4px">' + c.revisions.slice().reverse().map(function (r) {
       var what = r.event ? esc(r.event.staff) + ' ' + r.event.changes.map(function (ch) { return (ch.action === 'add' ? 'added a ' : 'replaced the ') + esc(ch.type_label.toLowerCase()) + ' with ' + esc(ch.original_name || 'a new file'); }).join(' and ') + '. Reason: ' + esc(r.event.reason) : 'Case created from the uploaded documents.';
+      if (r.scan_review) what = esc(r.scan_review.staff) + ' verified the scanned documents. Reason: ' + esc(r.scan_review.reason) + ' · ' + esc(when(r.scan_review.recorded_at));
       return '<div class="tl"><div class="tl-rail"><span class="tl-dot"></span><span class="tl-line"></span></div><div class="tl-b"><div style="font-weight:500">Revision ' + r.revision + ' · ' + esc(r.status_label) + '</div><div class="calc">' + what + (r.event ? ' · ' + esc(when(r.event.recorded_at)) : '') + '</div></div></div>';
     }).join('') + '</div></div>';
     main.innerHTML = '<div class="view"><div class="head"><div><div class="eyebrow"><a href="#/">Cases</a><span>/</span><span>' + esc(c.case_id) + '</span></div>' +
       '<div class="row" style="gap:12px;margin-top:4px"><h1 class="title" style="margin:0">' + esc(c.po_number || c.case_id) + '</h1>' + chip(c) + '</div>' +
-      '<p class="sub">Revision ' + c.revision + ' · ' + (c.mode === 'sample_records' ? 'bundled sample records, real matching and arithmetic' : 'live extraction') + ' · updated ' + esc(when(c.updated_at)) + '</p></div>' +
-      '<div class="row">' + (c.actions.add_receipt ? '<button type="button" class="btn" data-change="add_receipt">' + icon('box') + 'Add receipt</button>' : '') + (c.actions.replace_invoice ? '<button type="button" class="btn" data-change="replace_invoice">' + icon('receipt') + 'Replace invoice</button>' : '') + '</div></div>' +
+      '<p class="sub">Revision ' + c.revision + ' · ' + (c.mode === 'sample_records' ? 'bundled sample records, real matching and arithmetic' : c.mode === 'human_verified_extraction' ? 'staff-verified extraction' : 'live extraction') + ' · updated ' + esc(when(c.updated_at)) + '</p></div>' +
+      '<div class="row">' + (c.actions.verify_scans ? '<button type="button" class="btn pri" id="verify-scans">Verify scanned fields</button>' : '') + (c.actions.add_receipt ? '<button type="button" class="btn" data-change="add_receipt">' + icon('box') + 'Add receipt</button>' : '') + (c.actions.replace_invoice ? '<button type="button" class="btn" data-change="replace_invoice">' + icon('receipt') + 'Replace invoice</button>' : '') + '</div></div>' +
       '<div class="steps" aria-label="Checks run">' + stages + '</div>' + note + issues + trail +
       (c.status === 'ready_for_human_review' ? '<div class="banner good">' + icon('check', 18) + '<div class="grow">Every check passed. This is ready for a person to review; it is not approval to pay.</div></div>' : '') +
       '<div class="cols"><div class="col-main">' + totals + items + findings + '</div><div class="col-side">' + docs + history + '</div></div></div>';
     main.onclick = function (e) {
+      if (e.target.closest('#verify-scans')) openScanReview(c);
       var b = e.target.closest('[data-change]');
       if (b) openChange(c, b.getAttribute('data-change'));
       if (e.target.closest('#retry')) {
@@ -277,6 +279,12 @@
         toast('Revision ' + view.revision + ': ' + view.status_label.toLowerCase());
       }).catch(function (err) { state.busy = false; state.error = err.message; draw(); });
     };
+  }
+
+  function openScanReview(c) {
+    window.matchLedgerScanReview(c, api, esc, function(view) {
+      renderCase(view); loadCases(); toast('Verification saved; checks rerun.');
+    });
   }
 
   /* ---------- routing ---------- */

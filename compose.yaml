@@ -1,0 +1,22 @@
+services:
+  web:
+    build:
+      context: .
+      target: runtime
+    image: matchledger-ai:local
+    ports:
+      - "127.0.0.1:${MATCHLEDGER_PORT:-8002}:8000"
+    environment:
+      MATCHLEDGER_UI_MODE: ${MATCHLEDGER_UI_MODE:-sample}
+      MATCHLEDGER_PROVIDER: ${MATCHLEDGER_PROVIDER:-}
+      MATCHLEDGER_MODEL: ${MATCHLEDGER_MODEL:-}
+      MATCHLEDGER_PROMPT: ${MATCHLEDGER_PROMPT:-extract-v3}
+      MATCHLEDGER_MATCH_MODEL: ${MATCHLEDGER_MATCH_MODEL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    volumes:
+      - cases:/app/outputs
+    init: true
+volumes:
+  cases:

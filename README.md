@@ -4,8 +4,7 @@ Procurement and invoice reconciliation assistant — team starter.
 
 **Current branch: `Dhruv-integration`.** The agents now share one package layout.
 Start with [the integration guide](docs/INTEGRATION.md) for offline checks and the
-live upload command. This is an integration build, not the finished dashboard or
-Docker submission. Runtime AI requires your own configured provider credentials.
+live upload command. The [local dashboard](docs/WEB_APP.md) connects uploads, corrections and scan verification to the saved workflow. Docker submission packaging remains separate. Runtime AI requires your own configured provider credentials.
 
 ## Run locally (Python 3.11 or newer)
 
@@ -69,3 +68,7 @@ case revisions; this is not node-level LangGraph checkpointing.
 
 See [Matthew integration notes](docs/MATTHEW_INTEGRATION.md) for provenance,
 contract additions and exact-SKU limitations.
+
+## Dashboard and Docker
+
+Follow [dashboard acceptance checks](docs/DASHBOARD_CHECKLIST.md) and [Docker setup](docs/DOCKER_QUICKSTART.md). Docker defaults to sample mode; live extraction requires your own runtime credentials.

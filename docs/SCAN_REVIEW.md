@@ -29,6 +29,6 @@ Verification increments the revision, saves the previous state and staff review,
 
 ## Limits and evidence
 
-This is a local single-operator CLI/service implementation, ready for dashboard integration. It does not yet provide an image-and-fields GUI. Staff verification is an attestation, not independent machine proof. New document uploads/retries perform fresh extraction and do not inherit prior scan approval. Source hashes, revision checks and immutable history protect against stale confirmations. Line insertion/deletion and PO relinking are deliberately excluded from this operation.
+The local dashboard now offers **Verify scanned fields** on paused scan cases, with archived sources beside editable fields. Enter your name and verification notes, compare all fields, then confirm and save. The CLI remains available. Staff verification is an attestation, not independent machine proof. New document uploads/retries perform fresh extraction and do not inherit prior scan approval. Source hashes, revision checks and immutable history protect against stale confirmations. Line insertion/deletion and PO relinking are deliberately excluded from this operation.
 
 The original scanned evaluation reported 96.71% field accuracy and six documents with scoring errors and no extraction review flag, including a price of 8.50 misread as 850. These measurements predate this gate. Requiring human verification on every unverified scan reduces automatic coverage; it does not demonstrate that the model detects or corrects these errors.

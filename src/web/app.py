@@ -21,6 +21,7 @@ from fastapi.staticfiles import StaticFiles
 from src.case_store import CaseConflict, CaseStore
 from src.document_cases import change_documents, retry_documents, start_documents
 from src.extraction.providers import load_dotenv
+from src.scan_review import ScanReview, review_packet, verify_scans
 from src.web import sample_records
 from src.web.views import case_summary, case_view
 
@@ -180,6 +181,18 @@ def create_app(data_dir=None, mode=None, runner=None):
     async def retry(case_id: str, expected_revision: int = Form(...)):
         load(case_id)
         return await guarded(lambda: retry_documents(store, case_id, expected_revision, runner))
+
+    @app.get('/api/cases/{case_id}/scan-review')
+    def scan_packet(case_id: str):
+        record = load(case_id)
+        if not case_view(record)['actions']['verify_scans']:
+            raise HTTPException(400, 'This case is not awaiting scan verification.')
+        return review_packet(record)
+
+    @app.post('/api/cases/{case_id}/scan-review')
+    async def scan_confirm(case_id: str, packet: ScanReview):
+        load(case_id)
+        return await guarded(lambda: verify_scans(store, case_id, packet.model_dump()))
 
     @app.get('/api/cases/{case_id}/documents/{document_id}/file')
     def document_file(case_id: str, document_id: str):
